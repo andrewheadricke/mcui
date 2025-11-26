@@ -9,19 +9,14 @@ export class Ed25519SignatureVerifier {
    * timestamp (4 bytes LE) + flags (1 byte) + location (8 bytes LE, if present) + name (variable, if present)
    */
   static async verifyAdvertisementSignature(
-    publicKeyHex: string,
-    signatureHex: string,
+    publicKey: Uint8Array,
+    signature: Uint8Array,
     timestamp: number,
-    appDataHex: string
+    appData: Uint8Array
   ): Promise<boolean> {
-    try {
-      // Convert hex strings to Uint8Arrays
-      const publicKey = hexToBytes(publicKeyHex);
-      const signature = hexToBytes(signatureHex);
-      const appData = hexToBytes(appDataHex);
-      
+    try {      
       // Construct the signed message according to MeshCore format
-      const message = this.constructAdvertSignedMessage(publicKeyHex, timestamp, appData);
+      const message = this.constructAdvertSignedMessage(publicKey, timestamp, appData);
       
       // Verify the signature using noble-ed25519
       return await ed25519.verifyAsync(signature, message, publicKey);
@@ -37,11 +32,10 @@ export class Ed25519SignatureVerifier {
    * Format: public_key (32 bytes) + timestamp (4 bytes LE) + app_data (variable length)
    */
   static constructAdvertSignedMessage(
-    publicKeyHex: string,
+    publicKey: Uint8Array,
     timestamp: number,
     appData: Uint8Array
   ): Uint8Array {
-    const publicKey = hexToBytes(publicKeyHex);
     
     // Timestamp (4 bytes, little-endian)
     const timestampBytes = new Uint8Array(4);
@@ -74,12 +68,12 @@ export class Ed25519SignatureVerifier {
    * Get the hex representation of the signed message for debugging
    */
   static getSignedMessageHex(
-    publicKeyHex: string,
+    publicKey: Uint8Array,
     timestamp: number,
     appDataHex: string
   ): string {
     const appData = hexToBytes(appDataHex);
-    const message = this.constructAdvertSignedMessage(publicKeyHex, timestamp, appData);
+    const message = this.constructAdvertSignedMessage(publicKey, timestamp, appData);
     return bytesToHex(message);
   }
 

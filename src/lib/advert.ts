@@ -1,6 +1,7 @@
 import * as ed25519 from "@noble/ed25519"
 import BufferReader from "./buffer_reader";
 import BufferWriter from "./buffer_writer";
+import { Ed25519SignatureVerifier } from './ed25519verifier'
 
 export enum DeviceRole {
   ChatNode = 0x01,
@@ -59,7 +60,7 @@ class Advert {
       return a
     }
 
-    static fromBytes(bytes) {
+    static async fromBytes(bytes) {
 
       let a = new Advert()
       a.appData = new AppData()
@@ -70,7 +71,15 @@ class Advert {
       a.publicKey = bufferReader.readBytes(32);
       a.timestamp = bufferReader.readUInt32LE();
       a.signature = bufferReader.readBytes(64);
-      a.parseAppData(bufferReader.readRemainingBytes());
+      let appData = bufferReader.readRemainingBytes()
+
+      // verify signature
+      let validSignature = await Ed25519SignatureVerifier.verifyAdvertisementSignature(a.publicKey, a.signature,a.timestamp, appData)
+      if (!validSignature) {
+        throw new Error("invalid advert signature")
+      }
+
+      a.parseAppData(appData);
         
       return a
     }

@@ -124,9 +124,9 @@ class RadioStore {
       let srcHashForPathIngress: Uint8Array | null = null
   
       //console.log(pkt)
-      if (pkt.payload_type == 4) {
+      if (pkt.payload_type == Packet.PAYLOAD_TYPE_ADVERT) {
         let payload: any = pkt.parsePayload()
-        const advert = Advert.fromBytes(pkt.payload);
+        const advert = await Advert.fromBytes(pkt.payload);
         //console.log(advert)
 
         if (payload.app_data.name == null || payload.app_data.name[0] == "\u0000") {

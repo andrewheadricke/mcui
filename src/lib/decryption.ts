@@ -3,7 +3,7 @@ import { x25519 } from "@noble/curves/ed25519.js";
 import { convertPublicKeyToX25519 as edToX } from '@stablelib/ed25519';
 import { ChannelManager, Channel } from "./channels";
 import { Identity, IdentityManager } from "./identities";
-import BufferWriter from "./buffer_writer.ts";
+import BufferWriter from "./buffer_writer";
 import { ecb } from '@noble/ciphers/aes.js';
 import { hmac } from '@noble/hashes/hmac.js'
 
@@ -18,7 +18,7 @@ function decryptChannelMsg(payload: Uint8Array, channelManager: ChannelManager):
   let potentialChannels = channelManager.getChannelsByHash(channelHash)
   //console.log("potential channels", potentialChannels)
 
-  let plainTextBytes: Uint8Array = new Uint8Array()
+  let plainTextBytes: Uint8Array
   let plainText: string = ""
   let foundChannel: Channel | null = null
 
@@ -118,7 +118,7 @@ function decryptTxtMsg(payload: Uint8Array, identityManager: IdentityManager): a
   //console.log(potentialRecipients)
 
   let plainText: string = ""
-  let plainTextBytes: Uint8Array = new Uint8Array()
+  let plainTextBytes: Uint8Array
   let foundSender: Identity | null = null
   let foundRecipient: Identity | null = null
 

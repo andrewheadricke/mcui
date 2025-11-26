@@ -1,3 +1,11 @@
 {
+  "compilerOptions":{
+    "target": "es2020",
+    "moduleResolution": "nodenext",
+    "lib": [
+        "es2020",
+        "dom"
+    ]
+  },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "vite-env.d.ts"]
 }
