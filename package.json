@@ -1,0 +1,31 @@
+{
+  "name": "mcui",
+  "version": "0.0.2",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "patch": "replace ' assertRange\\(n, 1n, N\\);' ' //assertRange(n, 1n, N);' ./node_modules/@noble/ed25519/index.js"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^2.0.1",
+    "@noble/curves": "^2.0.1",
+    "@noble/ed25519": "3.0.0",
+    "@noble/hashes": "^2.0.1",
+    "@stablelib/ed25519": "^2.0.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/vite": "^4.1.16",
+    "fnv1a": "^1.1.1",
+    "leaflet": "^1.9.4",
+    "meshcore.js": "file:../meshcore.js/",
+    "mithril": "^2.3.7",
+    "tailwindcss": "^4.1.16"
+  },
+  "devDependencies": {
+    "replace": "^1.2.2",
+    "vite": "^7.1.12"
+  }
+}

@@ -1,0 +1,49 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@import "leaflet";
+
+@tailwind base;
+
+@theme {
+  --color-primary: #00d4ff;
+  --color-mesh: #0ff4c9;
+}
+
+.inline-svg {
+  display: inline;
+}
+
+.transparent-tooltips {
+  @apply text-base md:text-xs;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  font-weight: bold;  
+}
+
+.transparent-tooltips::before {
+  border: none;
+}
+
+.dot-marker {
+  background-color: red;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  border: 1px solid white;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #333; /* Tailwind equivalent: bg-gray-100 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* Tailwind equivalent: bg-gray-500 */
+  border-radius: 4px;
+}

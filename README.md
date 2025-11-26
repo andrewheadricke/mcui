@@ -1,0 +1,29 @@
+MCUI
+====
+A MeshCore compatible UI.
+
+This client essentially turns the MeshCore radio into a dumb modem, simply using RXLog and SendRawPacket only. The hardware private key is not used and no syncing of nodes or messages takes place.
+
+All app data (radios, identites, contacts etc) is stored in the browsers localStorage
+
+### Features
+
+* Meshcore over Websocket support
+* Multiple radios, with auto-connect for Websocket radios
+* Multiple identities, including importing existing MeshCore identities
+* Browser side cryptography, AES, ed25519, x25519, hmac
+* Passive link/route mapping
+* Decrypt all traffic for which a private key/secrets are known
+* Responsive UI, looks great on mobile and desktop
+
+### Notes
+
+* Requires a MeshCore firmware with SEND_RAWPACKET support, otherwise will operate in READONLY mode.
+* A small (1 line) patch to @noble/ed25519 is required for MeshCore public key derivation to work properly.
+* Requires meshcore.js with WebSocket support (currently not merged)
+
+### Build
+
+git clone ....  
+`npm i`  
+`npx vite build`
