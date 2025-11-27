@@ -1,5 +1,5 @@
 import m from 'mithril'
-import { xmark as svgXmark, circleNodes as svgCircleNodes, lock as svgLock, radio as svgRadio } from './svgs'
+import { xmark as svgXmark, circleNodes as svgCircleNodes, route as svgRoute, radio as svgRadio } from './svgs'
 import AppState from '../lib/appstate'
 
 export default {
@@ -36,10 +36,10 @@ export default {
           ),
           m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
             AppState.toggleMobileSlideOver()
-            AppState.setCurrentSection("Encrypted")
+            AppState.setCurrentSection("Traces")
           }},
-            m("div.inline-block w-6 me-2", m.trust(svgLock)), 
-            m("div.inline-block align-top", "Encrypted")
+            m("div.inline-block w-6 me-2", m.trust(svgRoute)), 
+            m("div.inline-block align-top", "Traces")
           )
         )
       )

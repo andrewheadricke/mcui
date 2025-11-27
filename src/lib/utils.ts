@@ -51,7 +51,25 @@ function rgbFractionToString(rgb) {
   return `rgb(${R}, ${G}, ${B})`;
 }
 
+function greenToRedViaYellow(p) {
+  let r, g, b;
+
+    if (p <= 0.1) {
+        r = 255;
+        g = Math.round(255 * (p / 0.1));
+        b = 0;
+    } else {
+        let progress = (p - 0.1) / 0.9;
+        r = Math.round(255 * (1 - progress));
+        g = 255;
+        b = 0;
+    }
+
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
 export {
   formatTimeDifference,
-  hslToRgb
+  hslToRgb,
+  greenToRedViaYellow
 }

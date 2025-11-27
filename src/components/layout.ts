@@ -13,7 +13,7 @@ import ChannelsSection from '../components/channels'
 import MobileBottomNav from './mobilebottomnav'
 import NeighborsSection from './neighbors'
 import LinksSection from './links'
-import EncryptedSection from './encrypted'
+import TracesSection from './traces'
 import MobileSlideOver from './mobile_slideover'
 
 import ChannelView from "./channelview"
@@ -37,8 +37,8 @@ let getSectionComponent = function() {
     return NeighborsSection
   } else if (AppState.currentSection == "Links") {
     return LinksSection
-  } else if (AppState.currentSection == "Encrypted") {
-    return EncryptedSection
+  } else if (AppState.currentSection == "Traces") {
+    return TracesSection
   }
 }
 

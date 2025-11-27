@@ -2,8 +2,8 @@ import m from 'mithril'
 
 import AppState from '../lib/appstate'
 import { walkieTalkie as svgWalkieTalkie, addressBook as svgAddressBook, broadcastOrig, circle as svgCircle } from './svgs'
-import { hashtag as svgHashtag, comments as svgComments, houseSignal as svgHouseSignal } from './svgs'
-import { map as svgMap, circleNodes as svgCircleNodes, lock as svgLock, userSecret as svgUserSecret } from './svgs'
+import { hashtag as svgHashtag, comments as svgComments } from './svgs'
+import { map as svgMap, circleNodes as svgCircleNodes, route as svgRoute, userSecret as svgUserSecret } from './svgs'
 
 export default {
   oninit: (vnode)=>{
@@ -14,9 +14,8 @@ export default {
     vnode.state.sections.push(["Channels", svgHashtag])
     vnode.state.sections.push(["Direct", svgComments])
     vnode.state.sections.push(["Map", svgMap])    
-    //vnode.state.sections.push(["Neighbors", svgHouseSignal])
     vnode.state.sections.push(["Links", svgCircleNodes])
-    vnode.state.sections.push(["Encrypted", svgLock])
+    vnode.state.sections.push(["Traces", svgRoute])
   },
   view:(vnode)=>{
 

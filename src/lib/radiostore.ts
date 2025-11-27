@@ -117,6 +117,10 @@ class RadioStore {
         m.redraw()
       }
     })
+    this.activeConnection.on(Constants.PushCodes.TraceData, (event)=>{
+      //console.log('TraceData', event)
+      AppState.traceManager.traceComplete(event)
+    })
     this.activeConnection.on(Constants.PushCodes.LogRxData, async (event) => {
       //console.log("LogRxData", event)
 
@@ -170,7 +174,7 @@ class RadioStore {
       } else if (pkt.payload_type == Packet.PAYLOAD_TYPE_ACK) {    
         let tmp = pkt.parsePayload()
         console.log("heard ack", bytesToHex(tmp.ack_code))
-      }
+      } 
   
       // add ingress path tracking
       AppState.packetLogs.addIngressPacket(pkt.getRouteTypeString(), pkt.path, srcHashForPathIngress)
