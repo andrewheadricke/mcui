@@ -29,17 +29,27 @@ let ChannelView = {
     
     Object.seal(vnode.state)
   },
+  oncreate: (vnode)=>{
+    let scrollPane = document.getElementById("messagesScrollPane")
+    scrollPane.scrollTop = scrollPane.scrollHeight
+  },
+  onupdate:(vnode)=>{
+    let scrollPane = document.getElementById("messagesScrollPane")
+    scrollPane.scrollTop = scrollPane.scrollHeight
+  },
   view: (vnode)=>{
-    return m("div.h-screen flex flex-col",
-      m("div.p-6 md:p-8 flex-1 flex flex-col min-h-0",
-        m("h2.text-2xl md:text-3xl font-bold mb-6", 
+    return m("div.flex flex-col h-full",
+      m("div.p-6 md:p-8",
+        m("h2.text-2xl md:text-3xl font-bold", 
           "Channel", m("div.inline-block ms-4 text-base rounded-xl bg-blue-500 px-4 py-2 relative", {style:"top:-5px;"}, vnode.attrs.channel.name),
           m("div.inline-block text-gray-500 w-4 ms-2 cursor-pointer", {onclick:(e)=>{
             AppState.channelManager.removeChannel(vnode.attrs.channel.name)
             vnode.attrs.closeChannelView()
           }}, m.trust(svgTrash))
-        ),
-        m("div.flex-1 overflow-y-auto custom-scrollbar",
+        )
+      ),
+      m("div.flex-1 flex flex-col overflow-hidden",
+        m("div.overflow-y-auto custom-scrollbar ps-4 h-full", {id:"messagesScrollPane"},
           AppState.messageStore.getMessagesFor(vnode.attrs.channel.name).map((msg)=>{
             let fnv = fnv1a(msg.senderName)
             let bgColor = hslToRgb(fnv, 0.6, 0.5)
@@ -57,30 +67,33 @@ let ChannelView = {
               )
             )
           })
+        ),
+        m("div.flex border-t-1 border-gray-800",
+          m("button.px-2 min-w-50 border-r-0 cursor-pointer", {onclick:(e)=>{
+            //if (vnode.state.showDropdown) {
+            //  return
+            //}
+            vnode.state.dropdownActivator = e.target
+            setTimeout(()=>{
+              globalThis.addEventListener('click', function(e) {
+                vnode.state.dropdownActivator = null
+                m.redraw()
+              }, {once: true})
+            }, 50)
+          }}, vnode.state.selectedIdentityText, " ", m.trust(svgDropdownArrow)),
+          m(DropdownIdentSelector, {ignoreActivatorPosition: true, classes:"bottom-0", activator: vnode.state.dropdownActivator, onSelect:(identity)=>{
+            vnode.state.selectedIdentity = identity
+            vnode.state.selectedIdentityText = identity.name
+          }}),
+          m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, oninput: (e)=>vnode.state.draftMsg=e.target.value}),
+          m("button.cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 w-14", {onclick:(e)=>{
+            if (vnode.state.draftMsg.length == 0) {
+              return
+            }
+            sendGroupMsg(vnode)
+          }}, m.trust(svgSend))
         )
-      ),      
-      m("div.flex border-t-1 border-gray-800",
-        m("button.px-2 min-w-50 border-r-0 cursor-pointer", {onclick:(e)=>{
-          //if (vnode.state.showDropdown) {
-          //  return
-          //}
-          vnode.state.dropdownActivator = e.target
-          setTimeout(()=>{
-            globalThis.addEventListener('click', function(e) {
-              vnode.state.dropdownActivator = null
-              m.redraw()
-            }, {once: true})
-          }, 50)
-        }}, vnode.state.selectedIdentityText, " ", m.trust(svgDropdownArrow)),
-        m(DropdownIdentSelector, {ignoreActivatorPosition: true, classes:"bottom-0", activator: vnode.state.dropdownActivator, onSelect:(identity)=>{
-          vnode.state.selectedIdentity = identity
-          vnode.state.selectedIdentityText = identity.name
-        }}),
-        m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, oninput: (e)=>vnode.state.draftMsg=e.target.value}),
-        m("button.cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 w-14", {onclick:(e)=>{
-          sendGroupMsg(vnode)
-        }}, m.trust(svgSend))
-      )
+      )      
     )
   }
 }

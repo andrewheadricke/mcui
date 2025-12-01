@@ -17,6 +17,12 @@ export default {
 
     Object.seal(vnode.state)
   },
+  onupdate:(vnode)=>{
+    let scrollPane = document.getElementById("messagesScrollPane")
+    if (scrollPane != null) {
+      scrollPane.scrollTop = scrollPane.scrollHeight
+    }
+  },
   view: (vnode)=>{
     let sendButtonColor = "gray"
     if (vnode.state.activeChat != null) {
@@ -71,7 +77,7 @@ export default {
                 recipientElem = m("div.text-xs text-right cursor-pointer", {onclick:(e)=>{
                   vnode.state.dropdownActivator = e.target
                   vnode.state.onIdentSelect = (ident)=>{
-                    chatDetails.recipient = ident
+                    AppState.messageStore.addLocalIdentToDirectChat(key, ident)
                   }
                   setTimeout(()=>{
                     globalThis.addEventListener('click', function(e) {
@@ -113,7 +119,7 @@ export default {
                 )
               )
             } else {
-              return m("div.flex-1 text-gray-600 p-4",
+              return m("div.flex-1 text-gray-600 p-4 overflow-auto", {id:"messagesScrollPane"},
                 AppState.messageStore.getDirectMessagesFor(vnode.state.activeChatKey).map((msg)=>{
                   return m("div.mb-2 size-fit",
                     m("div.bg-gray-200 px-2 py-1 rounded-xl text-black mb-1", msg.msg),

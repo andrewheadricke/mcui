@@ -155,6 +155,7 @@ export default {
             })(),
             dropdownCog,
             m("p.text-gray-500", "Name: ", m("span.font-bold", radio.username)),
+            m("p.text-gray-500", "Connection: ", m("span.font-bold", radio.connectionType)),
             m("p.text-gray-500", "Hardware: ", m("span.font-bold", radio.hardware)),
             m("p.text-gray-500", "Firmware: ", m("span.font-bold", radio.firmware)),
             m("p.text-gray-500", "Firmware Date: ", m("span.font-bold", radio.firmwareDate)),

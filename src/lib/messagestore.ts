@@ -1,4 +1,4 @@
-import { Identity } from './identities'
+import { Identity, IdentityManager } from './identities'
 import { sha256 } from '@noble/hashes/sha2.js'
 import BufferedWriter from './buffer_writer'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
@@ -10,23 +10,49 @@ class MessageStore {
   groupMessages: {}
   directMessages: {}
 
-  init(){
+  init(identityManager: IdentityManager){
     //this.messages = []
     this.uniqueMsgHashes = new Map<string, boolean>
     this.groupMessages = {}
-    this.directMessages = {}
+    this.directMessages = {}    
+    this.groupMessages = {"Public":[]}
 
-    // maybe load from localstorage?
+    // maybe load from localstorage
+    let tmpJson = localStorage.getItem("directchats")
+    if (tmpJson != null) {
+      let keys = JSON.parse(tmpJson)
+      for (let a = 0; a < keys.length; a++) {
+        let remoteIdentityKey = keys[a].slice(0,64)
+        let localIdentityKey = keys[a].slice(64)
 
-    /*for (let a = 0; a < 50; a++) {
+        let remoteIdentity = identityManager.getIdentity(remoteIdentityKey)
+        let localIdentity = identityManager.getIdentity(localIdentityKey)
+        this.directMessages[keys[a]] = {sender: remoteIdentity, recipient: localIdentity, msgs: []}
+      }
+    }
+
+
+
+    /*
+    for (let a = 0; a < 50; a++) {
       let m = new Message()
       m.senderName = "Billy"
       m.msg = "Hi there"
       m.channel = "Public"
-      this.messages.push(m)
-    }*/
+      this.groupMessages["Public"].push(m)
+    }
+    let counter = 0
+    setInterval(()=>{
+      counter++
+      let tmpM = new Message()
+      tmpM.senderName = "Billy"
+      tmpM.msg = "Hi there " + counter
+      tmpM.channel = "Public"
+      this.groupMessages["Public"].push(tmpM)
+      m.redraw()
+    }, 5000)
 
-    /*let firstName = [
+    let firstName = [
       "Alice",
       "Bob",
       "Catherine",
@@ -54,16 +80,13 @@ class MessageStore {
     let sender = new Identity()
     let recipient = new Identity()
     let rando = 0
-    for (let a = 0; a < 70; a++) {      
+    for (let a = 0; a < 150; a++) {
       if (rando <= 0) {
-        rando = Math.floor(Math.random() * 7)
+        rando = Math.floor(Math.random() * 20)
         //console.log(rando)
         sender = new Identity()
         recipient = new Identity()
         sender.name = firstName[Math.floor(Math.random() * 10)] + " " + lastName[Math.floor(Math.random() * 10)]
-        if (a == 0) {
-          sender.name = "[EViL] The Dutchman (tdeck)"
-        }
         let array = new Uint8Array(16)
         window.crypto.getRandomValues(array);
         sender.publicKey = array
@@ -121,6 +144,7 @@ class MessageStore {
       this.uniqueMsgHashes.set(msgHash, true)
     }
 
+    this.saveToLocalStorage()
     return newMsg
   }
 
@@ -146,6 +170,33 @@ class MessageStore {
 
   newDirectChat(remoteIdentity: Identity) {
     this.directMessages[remoteIdentity.getShortPublicKeyHex()] = { sender: remoteIdentity, msgs: []}
+  }
+
+  addLocalIdentToDirectChat(existingHalfKey: string, localIdent: Identity) {
+    let chatDetails = this.directMessages[existingHalfKey]
+    chatDetails.recipient = localIdent
+
+    delete this.directMessages[existingHalfKey]
+
+    let key = chatDetails.sender.getPublicKeyHex() + chatDetails.recipient.getPublicKeyHex()
+    if (this.directMessages.hasOwnProperty(key)) {
+      throw new Error("chat already exists")
+    } else {
+      this.directMessages[key] = chatDetails
+    }
+
+    //console.log(this.directMessages)
+    this.saveToLocalStorage()
+  }
+
+  saveToLocalStorage() {
+    let tmpKeys = []
+    for (let prop in this.directMessages) {
+      if (prop.length == 128) {
+        tmpKeys.push(prop)
+      }
+    }
+    localStorage.setItem("directchats", JSON.stringify(tmpKeys))
   }
 }
 

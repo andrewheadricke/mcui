@@ -44,7 +44,7 @@ export default {
               activeClass = "bg-primary/10 text-primary font-medium"
             }
             return m("li", m("button.cursor-pointer nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-500 " + activeClass, {onclick:(e)=>{
-              AppState.setCurrentSection(section[0])
+              AppState.setCurrentSection(section[0], {sidebarClicked: true})
             }}, m("span.w-5", m.trust(section[1])), section[0]))
           })
         )

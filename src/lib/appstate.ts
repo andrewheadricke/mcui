@@ -7,6 +7,7 @@ import { TraceManager } from "./tracemanager";
 
 let hasInit: boolean = false
 let currentSection: string = "Radio"
+let currentSectionParams: any = {}
 let showMobileSliderOver: boolean = false
 
 let radioStore: RadioStore
@@ -22,6 +23,7 @@ let init = function() {
   }
   hasInit = true
   currentSection = "Radio"
+
   showMobileSliderOver = false
 
   radioStore = new RadioStore()
@@ -33,15 +35,16 @@ let init = function() {
   packetLogs = new PacketLogs()
   packetLogs.init()
   messageStore = new MessageStore()
-  messageStore.init()
+  messageStore.init(identityManager)
   traceManager = new TraceManager()
   traceManager.init()
 }
 
-let setCurrentSection = function(name: string) {
+let setCurrentSection = function(name: string, params: any = {}) {
   if (name == "Radio" || name == "Map" || name == "Identities" || name == "Direct" || name == "Contacts" || name == "Channels" || 
     name == "Neighbors" || name == "Links" || name == "Traces") {
     currentSection = name
+    currentSectionParams = params
   } else {
     throw new Error("unknown section name")
   }
@@ -66,5 +69,7 @@ export default {
   get currentSection() { return currentSection },
   setCurrentSection,
   toggleMobileSlideOver,
-  get getShowMobileSlideOver() { return showMobileSliderOver }
+  get getShowMobileSlideOver() { return showMobileSliderOver },
+  getCurrentSectionParams: ()=>currentSectionParams,
+  clearCurrentSectionParams: ()=>currentSectionParams = {}
 }

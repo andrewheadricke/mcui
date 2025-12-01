@@ -1,5 +1,5 @@
 import m from 'mithril'
-import { towerCell as svgTowerCell, commentDots as svgCommentDots, trash as svgTrash } from './svgs'
+import { towerCell as svgTowerCell, commentDots as svgCommentDots, trash as svgTrash, users as svgUsers } from './svgs'
 import AppState from '../lib/appstate'
 import { formatTimeDifference } from "../lib/utils"
 
@@ -14,7 +14,9 @@ export default {
               (()=>{
                 //console.log(contact)
                 if (contact.type == "REPEATER") {
-                  return m("div.w-12 min-w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center", m("span.w-6", m.trust(svgTowerCell)))
+                  return m("div.w-12 min-w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center", m("span.w-6", m.trust(svgTowerCell)))                  
+                } else if (contact.type == "ROOM") { 
+                  return m("div.w-12 min-w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center", m("span.w-6", m.trust(svgUsers)))
                 } else {
                   let namePrefix = Array.from(contact.name)[0]
                   return m("div.w-12 min-w-12 h-12 rounded-full flex items-center justify-center font-bold", {style:"background-color:" + contact._rgb + ";"}, namePrefix)

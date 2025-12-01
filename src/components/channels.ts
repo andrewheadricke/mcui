@@ -52,9 +52,16 @@ let newChannelCard = {
 export default {
   oninit: (vnode)=>{
     vnode.state.viewingChannel = null
+    AppState.clearCurrentSectionParams()
+  },
+  onbeforeupdate: (vnode)=>{
+    if (AppState.getCurrentSectionParams().sidebarClicked) {
+      vnode.state.viewingChannel = null
+      AppState.clearCurrentSectionParams()
+    }
   },
   view: (vnode)=>{
-    return m("section.content-section",
+    return m("section.content-section flex flex-col h-full",
       (()=>{
         if (vnode.state.viewingChannel == null) {
           return m("div.p-6 md:p-8",
