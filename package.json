@@ -1,6 +1,6 @@
 {
   "name": "mcui",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "replace": "^1.2.2",
-    "vite": "^7.1.12"
+    "vite": "^7.1.12",
+    "vite-plugin-pwa": "^1.2.0"
   }
 }

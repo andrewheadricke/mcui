@@ -4,11 +4,13 @@ import { PacketLogs } from "./packetlogs";
 import { MessageStore } from "./messagestore";
 import { RadioStore } from "./radiostore";
 import { TraceManager } from "./tracemanager";
+import { RoomManager } from "./roommanager";
 
 let hasInit: boolean = false
 let currentSection: string = "Radio"
 let currentSectionParams: any = {}
 let showMobileSliderOver: boolean = false
+let activeModal = null
 
 let radioStore: RadioStore
 let identityManager: IdentityManager
@@ -16,6 +18,7 @@ let channelManager: ChannelManager
 let packetLogs: PacketLogs
 let messageStore: MessageStore
 let traceManager: TraceManager
+let roomManager: RoomManager
 
 let init = function() {
   if (hasInit) {
@@ -38,11 +41,13 @@ let init = function() {
   messageStore.init(identityManager)
   traceManager = new TraceManager()
   traceManager.init()
+  roomManager = new RoomManager()
+  roomManager.init(identityManager)
 }
 
 let setCurrentSection = function(name: string, params: any = {}) {
   if (name == "Radio" || name == "Map" || name == "Identities" || name == "Direct" || name == "Contacts" || name == "Channels" || 
-    name == "Neighbors" || name == "Links" || name == "Traces") {
+    name == "Neighbors" || name == "Links" || name == "Traces" || name == "Rooms") {
     currentSection = name
     currentSectionParams = params
   } else {
@@ -67,9 +72,12 @@ export default {
   get messageStore() { return messageStore },
   get traceManager() { return traceManager },
   get currentSection() { return currentSection },
+  get roomManager() { return roomManager },
   setCurrentSection,
   toggleMobileSlideOver,
   get getShowMobileSlideOver() { return showMobileSliderOver },
   getCurrentSectionParams: ()=>currentSectionParams,
-  clearCurrentSectionParams: ()=>currentSectionParams = {}
+  clearCurrentSectionParams: ()=>currentSectionParams = {},
+  getActiveModal: ()=>activeModal,
+  setActiveModal: (modalVnode)=>activeModal=modalVnode
 }

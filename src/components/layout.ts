@@ -15,6 +15,8 @@ import NeighborsSection from './neighbors'
 import LinksSection from './links'
 import TracesSection from './traces'
 import MobileSlideOver from './mobile_slideover'
+import RoomsSection from './rooms'
+import Modal from './modal'
 
 import ChannelView from "./channelview"
 
@@ -39,6 +41,8 @@ let getSectionComponent = function() {
     return LinksSection
   } else if (AppState.currentSection == "Traces") {
     return TracesSection
+  } else if (AppState.currentSection == "Rooms") {
+    return RoomsSection
   }
 }
 
@@ -59,7 +63,12 @@ export default {
         )
       ),
       m(MobileBottomNav),
-      m(MobileSlideOver)
+      m(MobileSlideOver),
+      (()=>{
+        if (AppState.getActiveModal()) {
+          return m(Modal)
+        }
+      })()
     ]
   }
 }

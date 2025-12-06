@@ -68,8 +68,14 @@ function greenToRedViaYellow(p) {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
 
+function percentageToGreenToRed(percentage) {
+  const hue = percentage * 120
+  return hslToRgb(hue, 1, 0.5)
+}
+
 export {
   formatTimeDifference,
   hslToRgb,
-  greenToRedViaYellow
+  greenToRedViaYellow,
+  percentageToGreenToRed
 }

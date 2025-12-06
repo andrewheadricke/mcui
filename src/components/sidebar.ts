@@ -2,7 +2,7 @@ import m from 'mithril'
 
 import AppState from '../lib/appstate'
 import { walkieTalkie as svgWalkieTalkie, addressBook as svgAddressBook, broadcastOrig, circle as svgCircle } from './svgs'
-import { hashtag as svgHashtag, comments as svgComments } from './svgs'
+import { hashtag as svgHashtag, comments as svgComments, users as svgUsers } from './svgs'
 import { map as svgMap, circleNodes as svgCircleNodes, route as svgRoute, userSecret as svgUserSecret } from './svgs'
 
 export default {
@@ -16,6 +16,7 @@ export default {
     vnode.state.sections.push(["Map", svgMap])    
     vnode.state.sections.push(["Links", svgCircleNodes])
     vnode.state.sections.push(["Traces", svgRoute])
+    vnode.state.sections.push(["Rooms", svgUsers])
   },
   view:(vnode)=>{
 

@@ -1,7 +1,7 @@
 import m from 'mithril'
 import AppState from '../lib/appstate'
 import { plus as svgPlus, trash as svgTrash, send as svgSend, spinner as svgSpinner, broom as svgBroom } from './svgs'
-import { greenToRedViaYellow } from '../lib/utils'
+import { greenToRedViaYellow, percentageToGreenToRed } from '../lib/utils'
 
 
 let onCardClick = (vnode)=>{
@@ -71,7 +71,7 @@ export default {
           if (isNaN(ratio)) {
             ratio = 0
           }
-          let color = greenToRedViaYellow(ratio / 100)
+          let color = percentageToGreenToRed(ratio / 100)
 
           return m("li.border-b-1 mb-2 p-2 border-gray-800 justify-top", 
             m("span.text-lg align-top text-gray-500", trace.name),

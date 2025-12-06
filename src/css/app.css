@@ -13,6 +13,10 @@
   display: inline;
 }
 
+.darkinput {
+  background-color: oklch(27.8% 0.033 256.848);
+}
+
 .transparent-tooltips {
   @apply text-base md:text-xs;
   background: transparent;

@@ -1,13 +1,13 @@
 import m from 'mithril'
 import { formatTimeDifference } from "../lib/utils"
-import { cog as svgCog, edit as svgEdit, circleCheck as svgCircleCheck, save as svgSave, broadcast as svgBroadcast } from './svgs'
+import { cog as svgCog, edit as svgEdit, circleCheck as svgCircleCheck, save as svgSave, broadcast as svgBroadcast, users as svgUsers } from './svgs'
 import { satellite as svgSatellite, trash as svgTrash } from './svgs'
 import AppState from '../lib/appstate'
 import { Packet } from "meshcore.js"
 
 const dropdownIdentity = {
   view: (vnode: any)=>{
-    return m("div.z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-40 right-5 absolute", {style:"box-shadow: 0px 0px 6px 6px rgba(0, 0, 0, 0.1);"},
+    return m("div.z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-45 right-5 absolute", {style:"box-shadow: 0px 0px 6px 6px rgba(0, 0, 0, 0.1);"},
       m("ul.py-2 text-sm text-gray-700",
         m("li",
           m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:()=>{
@@ -64,6 +64,13 @@ const dropdownIdentity = {
                     console.log(result)
                   }
                 }}, m.trust(svgSatellite), " Advert (Flood)")
+              ),
+              m("li",
+                m("a.block px-4 py-2 hover:bg-gray-100", {href:"#", onclick: async ()=>{
+                  let identity = AppState.identityManager.getIdentity(vnode.attrs.publicKey)
+                  identity.type = "ROOM"
+                  AppState.identityManager.saveIdentities()
+                }}, m("div.inline-block", {style:"width:20px;height:20px;"}, m.trust(svgUsers)), m("div.inline-block align-top ms-1", "Set Room Server"))
               )
             ]
           }

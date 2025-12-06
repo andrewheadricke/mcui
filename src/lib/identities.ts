@@ -1,7 +1,7 @@
 import * as ed25519 from "@noble/ed25519"
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js"
 import { sha512 } from "@noble/hashes/sha2.js"
-import Advert from './advert'
+import { default as Advert, DeviceRole } from './advert'
 import { Packet } from 'meshcore.js'
 import { packetSerialize } from "./packet_helper";
 import fnv1a from "fnv1a"
@@ -49,7 +49,7 @@ class IdentityManager {
 
   importPrivateKey(privateKeyHex: string): Identity | null {
 
-    console.log('importPrivateKey')
+    //console.log('importPrivateKey')
 
     let i = new Identity()
     const privateKey = hexToBytes(privateKeyHex)
@@ -63,7 +63,7 @@ class IdentityManager {
 
     i.firstSeen = Math.round(Date.now() / 1000)
 
-    console.log(i.getPublicKeyHex())
+    //console.log(i.getPublicKeyHex())
 
     // check this identity doesn't already exist
     if (this.uniquePubKeys.has(i.getPublicKeyHex())) {
@@ -225,6 +225,16 @@ class IdentityManager {
     return results
   }
 
+  getRooms(): Identity[] {
+    let results = []
+    for (let a = 0; a < this.myIdentities.length; a++) {
+      if (this.myIdentities[a].type == "ROOM") {
+        results.push(this.myIdentities[a])
+      }
+    }
+    return results
+  }
+
   async generateNew() {
     // replace sha512
     if (window.crypto.subtle == null) {
@@ -373,7 +383,15 @@ class Identity {
     //console.log('build advert packet')
 
     //console.log(this)
-    let advert = Advert.buildAdvertFromScratch(this.publicKey, Math.floor(Date.now()/1000), Advert.ADV_TYPE_CHAT, this.name)
+    let deviceRole: DeviceRole
+    if (this.type == "CHAT") {
+      deviceRole = DeviceRole.ChatNode
+    } else if (this.type == "ROOM") {
+      deviceRole = DeviceRole.RoomServer
+    } else if (this.type == "REPEATER") {
+      deviceRole = DeviceRole.Repeater
+    }
+    let advert = Advert.buildAdvertFromScratch(this.publicKey, Math.floor(Date.now()/1000), deviceRole, this.name)
     advert.signature = this.sign(advert.getBytesForSignature())
     
     //console.log(advert)

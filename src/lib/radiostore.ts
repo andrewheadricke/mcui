@@ -2,8 +2,9 @@ import { Connection, WebSocketConnection, WebBleConnection, WebSerialConnection,
 import m from 'mithril'
 import AppState from './appstate'
 import Advert from './advert'
-import { decryptChannelMsg, decryptTxtMsg } from "../lib/decryption";
+import { decryptChannelMsg, decryptTxtMsg, decryptAnonReq } from "../lib/decryption";
 import { bytesToHex } from '@noble/hashes/utils.js';
+import { buildResponse, buildSyncMsg } from "./txtbuilder";
 
 class RadioStore {
 
@@ -174,7 +175,16 @@ class RadioStore {
       } else if (pkt.payload_type == Packet.PAYLOAD_TYPE_ACK) {    
         let tmp = pkt.parsePayload()
         console.log("heard ack", bytesToHex(tmp.ack_code))
-      } 
+      } else if (pkt.payload_type == Packet.PAYLOAD_TYPE_ANON_REQ) {
+        let decodedResult = decryptAnonReq(pkt.payload, AppState.identityManager)
+        if (decodedResult.success && decodedResult.data.recipient.type == "ROOM") {
+          //console.log(decodedResult)
+          let respFrame = buildResponse(decodedResult.data.sender, decodedResult.data.recipient)
+          this.activeConnection.sendToRadioFrame(respFrame)
+          let room = AppState.roomManager.getRoom(decodedResult.data.recipient)
+          room.startSync(decodedResult.data.sender, decodedResult.data.syncTimestamp)          
+        }
+      }
   
       // add ingress path tracking
       AppState.packetLogs.addIngressPacket(pkt.getRouteTypeString(), pkt.path, srcHashForPathIngress)

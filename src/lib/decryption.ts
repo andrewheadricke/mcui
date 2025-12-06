@@ -4,8 +4,10 @@ import { convertPublicKeyToX25519 as edToX } from '@stablelib/ed25519';
 import { ChannelManager, Channel } from "./channels";
 import { Identity, IdentityManager } from "./identities";
 import BufferWriter from "./buffer_writer";
+import BufferReader from "./buffer_reader";
 import { ecb } from '@noble/ciphers/aes.js';
 import { hmac } from '@noble/hashes/hmac.js'
+import { bytesToHex } from "@noble/hashes/utils.js";
 
 function decryptChannelMsg(payload: Uint8Array, channelManager: ChannelManager): any {
   //console.log('decrypt channel msg', payload)
@@ -214,9 +216,90 @@ function decryptTxtMsg(payload: Uint8Array, identityManager: IdentityManager): a
   }; 
 }
 
+function decryptAnonReq(payload: Uint8Array, identityManager: IdentityManager): any {
+
+  const bufferReader = new BufferReader(payload)
+  let destinationHash = bufferReader.readByte()
+  let senderPublicKey = bufferReader.readBytes(32)
+  let cipherMac = bufferReader.readBytes(2)
+  let cipherTextBytes = bufferReader.readRemainingBytes()
+
+  let potentialRecipients = identityManager.getMyIdentitiesByFirstByte(destinationHash)
+  
+  let plainTextBytes: Uint8Array
+  let foundRecipient: Identity | null = null
+
+  for (let a = 0; a < potentialRecipients.length; a++) {
+    let recipient = potentialRecipients[a]
+
+    //console.log('decrypting ', sender, recipient)
+
+    const xPub = edToX(senderPublicKey);
+  
+    let sharedSecret = x25519.getSharedSecret(recipient.privateKey.slice(0, 32), xPub);
+    let secretKey = sharedSecret.slice(0, 16)
+
+    let derivedCiperMac = hmac(sha256, sharedSecret, cipherTextBytes)
+    if (derivedCiperMac[0] != cipherMac[0] || derivedCiperMac[1] != cipherMac[1]) {
+      console.log('cipherMAC does not match for ', bytesToHex(senderPublicKey))
+      //console.log("expected", cipherMac, "got", derivedCiperMac)
+      continue
+    }
+  
+    let aesecb = ecb(secretKey, {disablePadding: true})
+    let tmpPlainTextBytes = aesecb.decrypt(cipherTextBytes)
+
+    plainTextBytes = tmpPlainTextBytes
+    foundRecipient = recipient
+    break
+  }
+  
+  if (foundRecipient == null) {
+    // if we were unable to decrypt, lets get a list of all potential recipients, not just our identities
+    return {success: false, data: {
+      srcHash: senderPublicKey[0],
+      destHash: destinationHash,
+      potentialRecipients: identityManager.getIdentitiesByFirstByte(destinationHash)
+    }}
+  }
+
+  const timestamp = plainTextBytes[0] | 
+    (plainTextBytes[1] << 8) | 
+    (plainTextBytes[2] << 16) | 
+    (plainTextBytes[3] << 24);
+  const syncTimestamp = plainTextBytes[4] | 
+    (plainTextBytes[5] << 8) | 
+    (plainTextBytes[6] << 16) | 
+    (plainTextBytes[7] << 24);
+  const password = plainTextBytes.slice(8)
+  //console.log(password)
+
+  let ackData = new BufferWriter()
+  ackData.writeUInt32LE(timestamp)
+  ackData.writeBytes(password)
+  ackData.writeBytes(senderPublicKey)
+  //console.log(ackData.toBytes())
+  let ackHash = sha256(ackData.toBytes())
+
+  return {
+    success: true,
+    data: {
+      srcHash: senderPublicKey[0],
+      destHash: destinationHash,
+      timestamp,
+      recipient: foundRecipient,
+      sender: senderPublicKey,
+      syncTimestamp: syncTimestamp,
+      password: password,
+      ack: ackHash.slice(0, 4)
+    }
+  }; 
+}
+
 export {
   decryptChannelMsg,
-  decryptTxtMsg
+  decryptTxtMsg,
+  decryptAnonReq
 }
 
 function byteToHex(byte) {

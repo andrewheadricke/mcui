@@ -133,7 +133,7 @@ export default {
             m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, oninput: (e)=>vnode.state.draftMsg=e.target.value}),
             m("button.cursor-pointer bg-" + sendButtonColor + "-500 hover:bg-" + sendButtonColor + "-600 text-white font-bold px-3 w-12", {onclick:(e)=>{
               // from our perspective, a directchat recipient is us, so when building the reply tx, the "sender" param is recipient (us)
-              let pkt = buildDirectTxtPacket(vnode.state.activeChat.recipient, vnode.state.activeChat.sender, vnode.state.draftMsg)
+              let pkt = buildDirectTxtPacket(vnode.state.activeChat.recipient, vnode.state.activeChat.sender.publicKey, vnode.state.draftMsg)
               AppState.radioStore.sendToRadioFrame(pkt)
               vnode.state.draftMsg = ""
             }}, m.trust(svgSend))

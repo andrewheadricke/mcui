@@ -1,5 +1,5 @@
 import m from 'mithril'
-import { xmark as svgXmark, circleNodes as svgCircleNodes, route as svgRoute, radio as svgRadio } from './svgs'
+import { xmark as svgXmark, circleNodes as svgCircleNodes, route as svgRoute, radio as svgRadio, users as svgUsers } from './svgs'
 import AppState from '../lib/appstate'
 
 export default {
@@ -21,25 +21,32 @@ export default {
         ),
         m("nav.space-y-3",
           m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
-            AppState.toggleMobileSlideOver()
-            AppState.setCurrentSection("Radio")
-          }},
+              AppState.toggleMobileSlideOver()
+              AppState.setCurrentSection("Radio")
+            }},
             m("div.inline-block w-6 me-2", m.trust(svgRadio)), 
             m("div.inline-block align-top", "Radios")
           ),
           m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
-            AppState.toggleMobileSlideOver()
-            AppState.setCurrentSection("Links")
-          }},
+              AppState.toggleMobileSlideOver()
+              AppState.setCurrentSection("Links")
+            }},
             m("div.inline-block w-6 me-2", m.trust(svgCircleNodes)), 
             m("div.inline-block align-top", "Links")
           ),
           m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
-            AppState.toggleMobileSlideOver()
-            AppState.setCurrentSection("Traces")
-          }},
+              AppState.toggleMobileSlideOver()
+              AppState.setCurrentSection("Traces")
+            }},
             m("div.inline-block w-6 me-2", m.trust(svgRoute)), 
             m("div.inline-block align-top", "Traces")
+          ),
+          m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
+              AppState.toggleMobileSlideOver()
+              AppState.setCurrentSection("Rooms")
+            }},
+            m("div.inline-block w-6 me-2", m.trust(svgUsers)), 
+            m("div.inline-block align-top", "Rooms")
           )
         )
       )
