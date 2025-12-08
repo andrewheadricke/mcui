@@ -47,6 +47,15 @@ class IdentityManager {
     //console.log(this)
   }
 
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("identities")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
+  }
+
   importPrivateKey(privateKeyHex: string): Identity | null {
 
     //console.log('importPrivateKey')

@@ -2,7 +2,7 @@ import m from 'mithril'
 
 import AppState from '../lib/appstate'
 import { walkieTalkie as svgWalkieTalkie, addressBook as svgAddressBook, broadcastOrig, circle as svgCircle } from './svgs'
-import { hashtag as svgHashtag, comments as svgComments, users as svgUsers } from './svgs'
+import { hashtag as svgHashtag, comments as svgComments, users as svgUsers, sliders as svgSliders } from './svgs'
 import { map as svgMap, circleNodes as svgCircleNodes, route as svgRoute, userSecret as svgUserSecret } from './svgs'
 
 export default {
@@ -17,6 +17,8 @@ export default {
     vnode.state.sections.push(["Links", svgCircleNodes])
     vnode.state.sections.push(["Traces", svgRoute])
     vnode.state.sections.push(["Rooms", svgUsers])
+
+    vnode.state.showSettingsIcon = "opacity-0"
   },
   view:(vnode)=>{
 
@@ -28,9 +30,14 @@ export default {
     }
 
     return m("aside.hidden md:flex md:flex-col md:w-64 bg-gray-950 border-r border-gray-800",
-      m("div.p-6 border-b border-gray-800",
+      m("div.p-6 border-b border-gray-800", {onmouseover:()=>vnode.state.showSettingsIcon="opacity-100", onmouseleave:()=>vnode.state.showSettingsIcon="opacity-0"},
         m("h1.text-2xl font-bold text-primary flex items-center gap-3",
-          m("span.h-8 w-8 text-mesh", m.trust(broadcastOrig)), "MCui"
+          m("span.h-8 w-8 text-mesh", m.trust(broadcastOrig)), "MCui",
+          (()=>{
+            if (vnode.state.showSettingsIcon) {
+              return m("span.h-5 w-5 text-gray-500 cursor-pointer transition-opacity duration-500 " + vnode.state.showSettingsIcon, {onclick: ()=>AppState.setCurrentSection("Settings")}, m.trust(svgSliders))
+            }
+          })()          
         ),
         m("p.text-xs text-gray-500 mt-1", "A MeshCore compatible UI",
           m("span.float-right", "v", appVersion)

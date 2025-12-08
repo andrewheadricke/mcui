@@ -15,17 +15,33 @@ export default defineConfig({
       manifest: {
         short_name: "MCui",
         name: "MCui",
-        "description": "A Meshcore compatible UI",
+        description: "A Meshcore compatible UI",
+        theme_color: "#030712",
+        background_color: "#030712",
         icons: [
           {
-            src: "./mcui_192.png",
+            src: "./maskable_icon_x192.png",
             type: "image/png",
-            sizes: "192x192"
+            sizes: "192x192",
+            purpose: "maskable"
           },
           {
-            src: "./mcui_512.png",
+            src: "./maskable_icon_x512.png",
             type: "image/png",
-            sizes: "512x512"
+            sizes: "512x512",
+            purpose: "maskable"
+          },
+          {
+            src: "./mcui_192_rounded.png",
+            type: "image/png",
+            sizes: "192x192",
+            purpose: "any"
+          },
+          {
+            src: "./mcui_512_rounded.png",
+            type: "image/png",
+            sizes: "512x512",
+            purpose: "any"
           }
         ],
         start_url: "index.html",

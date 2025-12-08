@@ -31,8 +31,6 @@ class MessageStore {
       }
     }
 
-
-
     /*
     for (let a = 0; a < 50; a++) {
       let m = new Message()
@@ -102,6 +100,15 @@ class MessageStore {
       
       this.addDirectMessage(sender, recipient, Math.round(Date.now()/1000) + a, "hi there")
     }*/
+  }
+
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("directchats")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
   }
 
   addGroupMessage(channel: string, senderName: string, timestamp: number, msg: string): Message {

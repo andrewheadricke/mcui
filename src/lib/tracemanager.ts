@@ -20,6 +20,15 @@ class TraceManager {
       }
     }
   }
+
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("traces")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
+  }
   
   addTrace(name: string, path: string) {
     let newTrace = new Trace()

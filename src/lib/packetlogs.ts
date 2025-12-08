@@ -16,6 +16,15 @@ class PacketLogs {
     }
   }
 
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("links")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
+  }
+
   addLinks(path: Uint8Array) {
     if (path.length < 2) {
       return

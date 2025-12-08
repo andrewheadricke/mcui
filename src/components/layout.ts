@@ -17,6 +17,7 @@ import TracesSection from './traces'
 import MobileSlideOver from './mobile_slideover'
 import RoomsSection from './rooms'
 import Modal from './modal'
+import SettingsSection from './settings'
 
 import ChannelView from "./channelview"
 
@@ -43,6 +44,8 @@ let getSectionComponent = function() {
     return TracesSection
   } else if (AppState.currentSection == "Rooms") {
     return RoomsSection
+  } else if (AppState.currentSection == "Settings") {
+    return SettingsSection
   }
 }
 

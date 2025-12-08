@@ -11,6 +11,8 @@ let currentSection: string = "Radio"
 let currentSectionParams: any = {}
 let showMobileSliderOver: boolean = false
 let activeModal = null
+let currentLocation = {lat: 0, lon: 0}
+let storageSize = 0
 
 let radioStore: RadioStore
 let identityManager: IdentityManager
@@ -31,23 +33,32 @@ let init = function() {
 
   radioStore = new RadioStore()
   radioStore.init()
+  storageSize += radioStore.getStorageSize()
   identityManager = new IdentityManager()
   identityManager.init()
+  storageSize += identityManager.getStorageSize()
   channelManager = new ChannelManager()
   channelManager.init()
+  storageSize += channelManager.getStorageSize()
   packetLogs = new PacketLogs()
   packetLogs.init()
+  storageSize += packetLogs.getStorageSize()
   messageStore = new MessageStore()
   messageStore.init(identityManager)
+  storageSize += messageStore.getStorageSize()
   traceManager = new TraceManager()
   traceManager.init()
+  storageSize += traceManager.getStorageSize()
   roomManager = new RoomManager()
   roomManager.init(identityManager)
+  storageSize += roomManager.getStorageSize()
+
+  //console.log(storageSize)
 }
 
 let setCurrentSection = function(name: string, params: any = {}) {
   if (name == "Radio" || name == "Map" || name == "Identities" || name == "Direct" || name == "Contacts" || name == "Channels" || 
-    name == "Neighbors" || name == "Links" || name == "Traces" || name == "Rooms") {
+    name == "Neighbors" || name == "Links" || name == "Traces" || name == "Rooms" || name == "Settings") {
     currentSection = name
     currentSectionParams = params
   } else {
@@ -79,5 +90,6 @@ export default {
   getCurrentSectionParams: ()=>currentSectionParams,
   clearCurrentSectionParams: ()=>currentSectionParams = {},
   getActiveModal: ()=>activeModal,
-  setActiveModal: (modalVnode)=>activeModal=modalVnode
+  setActiveModal: (modalVnode)=>activeModal=modalVnode,
+  get storageUsed() { return storageSize }
 }

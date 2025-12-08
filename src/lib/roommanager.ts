@@ -25,6 +25,15 @@ class RoomManager {
     //console.log(this)
   }
 
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("rooms")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
+  }
+
   getRoom(roomOwnerIdentity: Identity): Room {
     if (this.rooms.hasOwnProperty(roomOwnerIdentity.getPublicKeyHex())) {
       return this.rooms[roomOwnerIdentity.getPublicKeyHex()]

@@ -1,14 +1,6 @@
 import m from 'mithril'
 import AppState from '../lib/appstate'
 
-let onCardClick = function(vnode){
-  return {onclick:(e)=>{
-    vnode.state.showNewChannelForm = true
-    vnode.state.onCardClick = null
-    vnode.state.pointer = ""
-  }}
-}
-
 let newMessageForm = {
   oninit: (vnode)=>{
     vnode.state.draftTimestamp = ""

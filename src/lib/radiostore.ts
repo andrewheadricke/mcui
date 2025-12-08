@@ -28,6 +28,15 @@ class RadioStore {
     }
   }
 
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("radios")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
+  }
+
   add(type: string, url: string | null): Radio {
     let r = new Radio()
     r.sendRawPacketSupport = false

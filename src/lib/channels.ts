@@ -29,6 +29,15 @@ class ChannelManager {
     }
   }
 
+  getStorageSize(): number {
+    let tmpJson = localStorage.getItem("channels")
+    if (tmpJson == null) {
+      return 0
+    } else {
+      return tmpJson.length
+    }
+  }
+
   saveToLocalStorage() {
     let exportList: any[] = []
     for (let a = 0; a < this.channels.length; a++) {
