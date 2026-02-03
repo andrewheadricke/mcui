@@ -11,7 +11,10 @@ let _markerShadow = markerShadow
 
 export default {
   oncreate: (vnode)=>{
-    vnode.state.map = L.map('map').setView([-28, 134], 4);
+    vnode.state.map = L.map('map', {
+      renderer: L.canvas()
+    }).setView([-28, 134], 4);
+    
     //vnode.state.map = L.map('map').setView([0, 0], 9);
     vnode.state.map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">Leaflet</a>')
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

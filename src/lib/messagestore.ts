@@ -14,7 +14,7 @@ class MessageStore {
     //this.messages = []
     this.uniqueMsgHashes = new Map<string, boolean>
     this.groupMessages = {}
-    this.directMessages = {}    
+    this.directMessages = {} as { sender: Identity, recipient: Identity, msgs: Message[] }
     this.groupMessages = {"Public":[]}
 
     // maybe load from localstorage
@@ -234,5 +234,6 @@ class Message {
 }
 
 export {
-  MessageStore
+  MessageStore,
+  Message
 }

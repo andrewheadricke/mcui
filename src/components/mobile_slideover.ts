@@ -1,5 +1,5 @@
 import m from 'mithril'
-import { xmark as svgXmark, circleNodes as svgCircleNodes, route as svgRoute, radio as svgRadio, users as svgUsers } from './svgs'
+import { xmark as svgXmark, circleNodes as svgCircleNodes, route as svgRoute, radio as svgRadio, users as svgUsers, plugCircleCheck as svgPlugCircleCheck } from './svgs'
 import { sliders as svgSliders } from './svgs'
 import AppState from '../lib/appstate'
 
@@ -50,12 +50,24 @@ export default {
             m("div.inline-block align-top", "Rooms")
           ),
           m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
-            AppState.toggleMobileSlideOver()
-            AppState.setCurrentSection("Settings")
-          }},
-          m("div.inline-block w-6 me-2", m.trust(svgSliders)), 
-          m("div.inline-block align-top", "Settings")
-        )
+              AppState.toggleMobileSlideOver()
+              AppState.setCurrentSection("Settings")
+            }},
+            m("div.inline-block w-6 me-2", m.trust(svgSliders)), 
+            m("div.inline-block align-top", "Settings")
+          ),
+          (()=>{
+            // only show Quit button if AndroidBridge is available
+            if (globalThis.AndroidBridge != null) {
+              return m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
+                 AppState.toggleMobileSlideOver()
+                 globalThis.AndroidBridge.shutdown()
+                }},
+                m("div.inline-block w-6 me-2", m.trust(svgPlugCircleCheck)), 
+                m("div.inline-block align-top", "Quit")
+              )
+            }
+          })()          
         )
       )
     )

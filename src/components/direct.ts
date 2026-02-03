@@ -4,6 +4,8 @@ import AppState from '../lib/appstate'
 import { formatTimeDifference } from '../lib/utils'
 import DropdownIdentSelector from './dropdown_ident_selector'
 import { buildDirectTxtPacket } from '../lib/txtbuilder'
+import { Identity } from '../lib/identities'
+import { Message } from '../lib/messagestore'
 
 export default {
   oninit: (vnode)=>{
@@ -67,9 +69,14 @@ export default {
           (()=>{
             let results: any[] = []
             Object.keys(vnode.state.chats).forEach((key)=>{
-              let chatDetails = vnode.state.chats[key]
+              let chatDetails = vnode.state.chats[key] as {sender: Identity, recipient: Identity, msgs: Message[] }
               //console.log(chatDetails)
-              let senderNamePrefix = Array.from(chatDetails.sender.name)[0]
+              let senderNamePrefix: string = ""
+              let senderName: string = ""
+              if (chatDetails.sender != null) {
+                senderNamePrefix = Array.from(chatDetails.sender.name)[0]
+                senderName = chatDetails.sender.name
+              }
               let recipientElem
               if (chatDetails.recipient != null) {
                 recipientElem = m("div.text-xs text-right", "local: ", chatDetails.recipient.name)
@@ -88,19 +95,23 @@ export default {
                 }}, "choose sender identity")
               }
 
+              let rgb = ""
+              if (chatDetails.sender != null) {
+                rgb = chatDetails.sender._rgb
+              }
               results.push(                
                 m("div.border-b-1 border-gray-800 p-2 hover:bg-gray-800/30 cursor-pointer text-nowrap w-full flex flex-row", {onclick:()=>{
-                  if (chatDetails.recipient == null) {
+                  if (chatDetails.recipient == null || chatDetails.sender == null) {
                     return
                   }
                   vnode.state.activeChatKey = key
                   vnode.state.activeChat = chatDetails
                 }},
                   m("div.inline-block align-top relative top-1",            
-                    m("div.w-12 min-w-12 h-12 rounded-full flex items-center justify-center font-bold", {style:"background-color:" + chatDetails.sender._rgb + ";"}, senderNamePrefix)
+                    m("div.w-12 min-w-12 h-12 rounded-full flex items-center justify-center font-bold", {style:"background-color:" + rgb + ";"}, senderNamePrefix)
                   ),
                   m("div.inline-block p-2 text-gray-500 align-top flex-1 relative",
-                    m("div.font-bold", chatDetails.sender.name),
+                    m("div.font-bold", senderName),
                     recipientElem
                   )
                 )
