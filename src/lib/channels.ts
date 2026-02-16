@@ -38,12 +38,28 @@ class ChannelManager {
     }
   }
 
-  saveToLocalStorage() {
+  clearData() {
+    this.channels = []
+    localStorage.removeItem("channels")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("channels", JSON.stringify(data))
+    }
+  }
+
+  exportData() {
     let exportList: any[] = []
     for (let a = 0; a < this.channels.length; a++) {
       exportList.push(this.channels[a].export())
     }
-    localStorage.setItem("channels", JSON.stringify(exportList))
+    return exportList
+  }
+
+  saveToLocalStorage() {
+    let data = this.exportData()
+    localStorage.setItem("channels", JSON.stringify(data))
   }
 
   getChannels(): Channel[] {

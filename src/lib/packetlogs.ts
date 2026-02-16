@@ -64,7 +64,22 @@ class PacketLogs {
   }
 
   saveToLocalStorage() {
-    localStorage.setItem("links", JSON.stringify(this.links))
+    localStorage.setItem("links", JSON.stringify(this.exportData()))
+  }
+
+  clearData() {
+    this.links = {} as {link: String, usage: number}
+    localStorage.removeItem("links")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("links", JSON.stringify(data))
+    }
+  }
+
+  exportData() {
+    return this.links
   }
 
   addEncryptedPacket(path: Uint8Array, rawPkt: Uint8Array) {

@@ -1,9 +1,10 @@
 import m from 'mithril'
 import { formatTimeDifference } from "../lib/utils"
-import { cog as svgCog, edit as svgEdit, circleCheck as svgCircleCheck, save as svgSave, broadcast as svgBroadcast, users as svgUsers } from './svgs'
+import { key as svgKey, cog as svgCog, edit as svgEdit, circleCheck as svgCircleCheck, save as svgSave, broadcast as svgBroadcast, users as svgUsers } from './svgs'
 import { satellite as svgSatellite, trash as svgTrash } from './svgs'
 import AppState from '../lib/appstate'
 import { Packet } from "meshcore.js"
+import { bytesToHex } from '@noble/hashes/utils.js'
 
 const dropdownIdentity = {
   view: (vnode: any)=>{
@@ -71,6 +72,34 @@ const dropdownIdentity = {
                   identity.type = "ROOM"
                   AppState.identityManager.saveIdentities()
                 }}, m("div.inline-block", {style:"width:20px;height:20px;"}, m.trust(svgUsers)), m("div.inline-block align-top ms-1", "Set Room Server"))
+              ),
+              m("li",
+                m("a.block px-4 py-2 hover:bg-gray-100", {href:"#", onclick: async ()=>{
+                  // show modal
+                  let privateKeyHex = bytesToHex(vnode.attrs.privateKey)
+
+                  let privateKeyModal = {view:(vnode)=>{
+                    return m("div.h-full flex flex-col",
+                      m("div.bg-white px-4 pb-4 p-4 sm:pb-4 text-black",
+                        m("div.sm:flex sm:items-start",
+                          m("div.text-center sm:mt-0 sm:ml-4 sm:text-left",
+                            m("h3.text-base font-semibold text-gray-900", "View Private Key")
+                          )
+                        )
+                      ),
+                      m("section.flex-1 text-gray-900 m-5 break-all", {style:"font-family: 'Courier New', monospace;"},
+                        privateKeyHex
+                      ),
+                      m("section.border-t-1 border-gray-500 p-2 flex justify-end",
+                        m("button.inline-block text-base font-bold rounded-xl bg-gray-500 px-4 py-2 relative cursor-pointer", {onclick: ()=>{
+                          AppState.setActiveModal(null)
+                        }}, "Ok")
+                      )
+                    )
+                  }}
+
+                  AppState.setActiveModal(privateKeyModal)
+                }}, m("div.inline-block", {style:"width:20px;height:20px;"}, m.trust(svgKey)), m("div.inline-block align-top ms-1", "View Private Key"))
               )
             ]
           }
@@ -113,7 +142,7 @@ export default {
       ),
       (()=>{
         if (vnode.state.menuVisible) {
-          return m(dropdownIdentity, {autoAck: vnode.attrs.identity.autoAck, isContact: vnode.attrs.identity.privateKey == null, showNameEdit: ()=>vnode.state.showNameEdit=true, publicKey: vnode.attrs.identity.getPublicKeyHex()})
+          return m(dropdownIdentity, {privateKey: vnode.attrs.identity.privateKey, autoAck: vnode.attrs.identity.autoAck, isContact: vnode.attrs.identity.privateKey == null, showNameEdit: ()=>vnode.state.showNameEdit=true, publicKey: vnode.attrs.identity.getPublicKeyHex()})
         }
       })(),
       (()=>{

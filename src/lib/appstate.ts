@@ -56,6 +56,41 @@ let init = function() {
   //console.log(storageSize)
 }
 
+let clearAllData = function() {
+  radioStore.clearData()
+  identityManager.clearData()
+  channelManager.clearData()
+  packetLogs.clearData()
+  messageStore.clearData()
+  traceManager.clearData()
+  roomManager.clearData()
+}
+
+let exportData = function() {
+  let data = {radio: null, identities: null, channels: null, packetLogs: null, messageStore: null, traceManager: null, roomManager: null}
+  data.radio = radioStore.exportData()
+  data.identities = identityManager.exportIdentities()
+  data.channels = channelManager.exportData()
+  data.packetLogs = packetLogs.exportData()
+  data.messageStore = messageStore.exportData()
+  data.traceManager = traceManager.exportData()
+  data.roomManager = roomManager.exportData()
+  return data
+}
+
+let importData = function(data) {
+  //console.log(data)
+  //return
+  radioStore.importData(data.radio)
+  identityManager.importData(data.identities)
+  channelManager.importData(data.channels)
+  packetLogs.importData(data.packetLogs)
+  messageStore.importData(data.messageStore)
+  traceManager.importData(data.traceManager)
+  roomManager.importData(data.roomManager)
+  window.location.reload();
+}
+
 let setCurrentSection = function(name: string, params: any = {}) {
   if (name == "Radio" || name == "Map" || name == "Identities" || name == "Direct" || name == "Contacts" || name == "Channels" || 
     name == "Neighbors" || name == "Links" || name == "Traces" || name == "Rooms" || name == "Settings") {
@@ -91,5 +126,8 @@ export default {
   clearCurrentSectionParams: ()=>currentSectionParams = {},
   getActiveModal: ()=>activeModal,
   setActiveModal: (modalVnode)=>activeModal=modalVnode,
-  get storageUsed() { return storageSize }
+  get storageUsed() { return storageSize },
+  exportData,
+  clearAllData,
+  importData
 }

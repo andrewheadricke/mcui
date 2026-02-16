@@ -45,14 +45,29 @@ class RoomManager {
     }
   }
 
-  saveToLocalStorage() {
+  clearData() {
+    this.rooms = {} as {string: Room} 
+    localStorage.removeItem("rooms")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("rooms", JSON.stringify(data))
+    }
+  }
+
+  exportData() {
     let jsonToSave = {}
 
     for (let publicKey in this.rooms) {
       jsonToSave[publicKey] = this.rooms[publicKey].history
     }
+    return jsonToSave
+  }
 
-    localStorage.setItem("rooms", JSON.stringify(jsonToSave))
+  saveToLocalStorage() {    
+    let data = this.exportData()
+    localStorage.setItem("rooms", JSON.stringify(data))
   }
 }
 

@@ -196,14 +196,34 @@ class MessageStore {
     this.saveToLocalStorage()
   }
 
-  saveToLocalStorage() {
+  clearData() {
+    this.uniqueMsgHashes = new Map<string, boolean>
+    this.groupMessages = {}
+    this.directMessages = {} as { sender: Identity, recipient: Identity, msgs: Message[] }
+    this.groupMessages = {"Public":[]}
+
+    localStorage.removeItem("directchats")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("directchats", JSON.stringify(data))
+    }
+  }
+
+  exportData() {
     let tmpKeys = []
     for (let prop in this.directMessages) {
       if (prop.length == 128) {
         tmpKeys.push(prop)
       }
     }
-    localStorage.setItem("directchats", JSON.stringify(tmpKeys))
+    return tmpKeys
+  }
+
+  saveToLocalStorage() {
+    let data = this.exportData()
+    localStorage.setItem("directchats", JSON.stringify(data))
   }
 }
 

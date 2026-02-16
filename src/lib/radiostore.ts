@@ -28,6 +28,21 @@ class RadioStore {
     }
   }
 
+  clearData() {
+    this.radios = []
+    localStorage.removeItem("radios")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("radios", JSON.stringify(data))
+    }
+  }
+
+  exportData() {
+    return this.radios
+  }
+
   getStorageSize(): number {
     let tmpJson = localStorage.getItem("radios")
     if (tmpJson == null) {

@@ -23,7 +23,20 @@ All app data (radios, identites, contacts etc) is stored in the browsers localSt
 * Requires meshcore.js with WebSocket support (currently not merged)
 
 ### Build
-
+```
 git clone ....  
-`npm i`  
-`npx vite build`
+npm i
+npm run patch
+npx vite build
+```
+
+### HTTP Security issues
+
+If accessing from https/pwa you may only be able to connect to secure (wss://) or ws://localhost websockets.
+Here are two workarounds:
+
+* add the websocket url to the exceptions list in the browser  
+  `brave://flags/#unsafely-treat-insecure-origin-as-secure`
+
+* use a locally run port bouncer with socat  
+  `socat TCP-LISTEN:5000,reuseaddr,fork TCP:192.168.0.<your host>:5000`

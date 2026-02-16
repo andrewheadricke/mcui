@@ -172,13 +172,34 @@ class IdentityManager {
     this.cache_sorted_contacts = []
   }
 
-  saveIdentities() {
+  exportIdentities() {
     let exportList: any[] = []
     for (let a = 0; a < this.identities.length; a++) {
       exportList.push(this.identities[a].export())
     }
     //console.log(exportList)
-    localStorage.setItem("identities", JSON.stringify(exportList))
+    return exportList
+  }
+
+  clearData() {
+    this.identities = []
+    this.myIdentities = []
+    this.contacts = []
+    this.activeIdentity = -1
+    this.uniquePubKeys = new Map<string, Identity>()
+    this.cache_sorted_contacts = []
+
+    localStorage.removeItem("identities")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("identities", JSON.stringify(data))
+    }
+  }
+
+  saveIdentities() {
+    localStorage.setItem("identities", JSON.stringify(this.exportIdentities()))
   }
 
   getMyIdentities(): Identity[] {

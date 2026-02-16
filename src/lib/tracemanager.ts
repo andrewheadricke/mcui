@@ -40,7 +40,18 @@ class TraceManager {
     this.saveToLocalStorage()
   }
 
-  saveToLocalStorage() {
+  clearData() {
+    this.traces = []
+    localStorage.removeItem("traces")
+  }
+
+  importData(data) {
+    if (data != null) {
+      localStorage.setItem("traces", JSON.stringify(data))
+    }
+  }
+
+  exportData() {
     let exportData = []
     for (let a = 0; a < this.traces.length; a++) {
       let t = Object.assign({}, this.traces[a])
@@ -49,7 +60,12 @@ class TraceManager {
       delete t._lastResult
       exportData.push(t)
     }
-    localStorage.setItem("traces", JSON.stringify(exportData))
+    return exportData
+  }
+
+  saveToLocalStorage() {
+    let data = this.exportData()
+    localStorage.setItem("traces", JSON.stringify(data))
     //localStorage.setItem("traces", JSON.stringify(this.traces))
   }
 
