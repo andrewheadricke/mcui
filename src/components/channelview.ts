@@ -85,7 +85,15 @@ let ChannelView = {
             vnode.state.selectedIdentity = identity
             vnode.state.selectedIdentityText = identity.name
           }}),
-          m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, oninput: (e)=>vnode.state.draftMsg=e.target.value}),
+          m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, 
+            oninput: (e)=>vnode.state.draftMsg=e.target.value, onkeydown: (e)=>{
+              if (e.key === "Enter") {
+                if (vnode.state.draftMsg.length == 0) {
+                  return
+                }
+                sendGroupMsg(vnode)    
+              }
+            }}),
           m("button.cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold px-3 w-14", {onclick:(e)=>{
             if (vnode.state.draftMsg.length == 0) {
               return

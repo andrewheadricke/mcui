@@ -2,6 +2,7 @@ import { Identity, IdentityManager } from './identities'
 import { sha256 } from '@noble/hashes/sha2.js'
 import BufferedWriter from './buffer_writer'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
+import { Buffer } from 'buffer'
 
 class MessageStore {
   //messages: Message[]
@@ -22,17 +23,23 @@ class MessageStore {
     if (tmpJson != null) {
       let keys = JSON.parse(tmpJson)
       for (let a = 0; a < keys.length; a++) {
-        let remoteIdentityKey = keys[a].slice(0,64)
-        let localIdentityKey = keys[a].slice(64)
+        let ident1 = identityManager.getIdentity(keys[a].slice(0,64))
+        let ident2 = identityManager.getIdentity(keys[a].slice(64))
 
-        let remoteIdentity = identityManager.getIdentity(remoteIdentityKey)
-        let localIdentity = identityManager.getIdentity(localIdentityKey)
+        let remoteIdentity
+        let localIdentity
+        if (ident1.hasPrivateKey()) {                  
+          remoteIdentity = ident2
+          localIdentity = ident1
+        } else {
+          remoteIdentity = ident1
+          localIdentity = ident2
+        }
         this.directMessages[keys[a]] = {sender: remoteIdentity, recipient: localIdentity, msgs: []}
       }
     }
 
-    /*
-    for (let a = 0; a < 50; a++) {
+    /*for (let a = 0; a < 50; a++) {
       let m = new Message()
       m.senderName = "Billy"
       m.msg = "Hi there"
@@ -132,6 +139,16 @@ class MessageStore {
     return newMsg
   }
 
+  getSortedKey(ident1: Identity, ident2: Identity): string {
+    let buf1 = Buffer.from(ident1.publicKey)
+    let buf2 = Buffer.from(ident2.publicKey)
+    if (buf1.compare(buf2) > 0) {
+      return ident1.getPublicKeyHex() + ident2.getPublicKeyHex()
+    } else {
+      return ident2.getPublicKeyHex() + ident1.getPublicKeyHex()
+    }
+  }
+
   addDirectMessage(sender: Identity, recipient: Identity, timestamp: number, msg: string): Message {
     let newMsg = new Message()
 
@@ -142,7 +159,7 @@ class MessageStore {
 
     let msgHash = newMsg.getHash()
     if (this.uniqueMsgHashes.has(msgHash) == false) {
-      let key = sender.getPublicKeyHex() + recipient.getPublicKeyHex()
+      let key = this.getSortedKey(sender, recipient)
       if (this.directMessages.hasOwnProperty(key)) {
         this.directMessages[key].msgs.push(newMsg)
       } else {
@@ -185,7 +202,7 @@ class MessageStore {
 
     delete this.directMessages[existingHalfKey]
 
-    let key = chatDetails.sender.getPublicKeyHex() + chatDetails.recipient.getPublicKeyHex()
+    let key = this.getSortedKey(chatDetails.sender, chatDetails.recipient)
     if (this.directMessages.hasOwnProperty(key)) {
       throw new Error("chat already exists")
     } else {

@@ -141,12 +141,31 @@ export default {
             }
           })(),          
           m("div.flex border-t-1 border-gray-800 ms-1x",
-            m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, oninput: (e)=>vnode.state.draftMsg=e.target.value}),
+            m("input.w-full flex-grow text-gray-600 px-2 focus:outline-none focus:ring-1 focus:ring-blue-500", {type:"text", placeholder:"Send a message...", value: vnode.state.draftMsg, 
+              oninput: (e)=>vnode.state.draftMsg=e.target.value, onkeydown: (e)=>{
+                if (e.key === "Enter") {
+                  if (vnode.state.draftMsg.length == 0) {
+                    return
+                  }
+                  let pkt = buildDirectTxtPacket(vnode.state.activeChat.recipient, vnode.state.activeChat.sender.publicKey, vnode.state.draftMsg)
+                  AppState.radioStore.sendToRadioFrame(pkt)
+                  vnode.state.draftMsg = ""
+                }
+              }}),
             m("button.cursor-pointer bg-" + sendButtonColor + "-500 hover:bg-" + sendButtonColor + "-600 text-white font-bold px-3 w-12", {onclick:(e)=>{
+              if (vnode.state.draftMsg.length == 0) {
+                return
+              }
               // from our perspective, a directchat recipient is us, so when building the reply tx, the "sender" param is recipient (us)
               let pkt = buildDirectTxtPacket(vnode.state.activeChat.recipient, vnode.state.activeChat.sender.publicKey, vnode.state.draftMsg)
-              AppState.radioStore.sendToRadioFrame(pkt)
+              AppState.radioStore.sendToRadioFrame(pkt)            
+
+              if (vnode.state.activeChat.recipient.hasPrivateKey()) {
+                AppState.messageStore.addDirectMessage(vnode.state.activeChat.recipient, vnode.state.activeChat.sender, Math.round(Date.now()/1000), vnode.state.draftMsg)
+              }
+
               vnode.state.draftMsg = ""
+
             }}, m.trust(svgSend))
           )
         )

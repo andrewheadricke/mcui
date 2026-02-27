@@ -2,6 +2,7 @@ import m from 'mithril'
 import { plus as svgPlus, plug as svgPlug } from './svgs'
 import { websocket as svgWebsocket, bluetooth as svgBluetooth, usb as svgUsb } from './svgs'
 import { cog as svgCog, trash as svgTrash, plugCircleCheck as svgPlugCircleCheck } from './svgs'
+import { batteryHalf as svgBatteryHalf } from './svgs'
 import AppState from '../lib/appstate'
 
 let NewRadioForm = {
@@ -99,6 +100,11 @@ let dropdownRadio = {
         ),
         m("li",
           m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:()=>{
+            AppState.radioStore.getVoltage()
+          }}, m("div.inline-block w-5 me-2", m.trust(svgBatteryHalf)), m("div.inline-block align-top", "Get Voltage"))
+        ),
+        m("li",
+          m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:()=>{
             AppState.radioStore.removeRadio(vnode.attrs.radio)
           }}, m("div.inline-block w-5 me-2", m.trust(svgTrash)), m("div.inline-block align-top", "Remove"))
         )
@@ -160,6 +166,11 @@ export default {
             m("p.text-gray-500", "Firmware: ", m("span.font-bold", radio.firmware)),
             m("p.text-gray-500", "Firmware Date: ", m("span.font-bold", radio.firmwareDate)),
             m("p.text-gray-500", "Send Raw Packet support: ", m("span.font-bold", JSON.stringify(radio.sendRawPacketSupport))),
+            (()=>{
+              if (radio.voltage != null) {
+                return m("p.text-gray-500", "Voltage: ", m("span.font-bold", radio.voltage, "v"))
+              }
+            })(),            
             m("div.mt-2 flex justify-center", 
               (()=>{
                 if (connectedNotice == "") {

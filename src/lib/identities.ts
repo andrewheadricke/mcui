@@ -346,6 +346,10 @@ class Identity {
     return null
   }
 
+  hasPrivateKey(): boolean {
+    return this.privateKey != null
+  }
+
   getPublicKeyHex(): string {
     return bytesToHex(this.publicKey)
   }
@@ -353,6 +357,16 @@ class Identity {
   getShortPublicKeyHex(): string {
     let pubkeyHex = bytesToHex(this.publicKey)
     return pubkeyHex.slice(0, 8) + "..." + pubkeyHex.slice(pubkeyHex.length - 8)
+  }
+
+  getNodeTypeNumber(): number {
+    if (this.type == "CHAT") {
+      return 1
+    } else if (this.type == "REPEATER") {
+      return 2
+    } else if (this.type == "ROOM") {
+      return 3
+    }
   }
 
   updateRgb() {

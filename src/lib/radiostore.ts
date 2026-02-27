@@ -130,6 +130,11 @@ class RadioStore {
         m.redraw()
       }
     })
+    this.activeConnection.on(Constants.ResponseCodes.BatteryVoltage, (event)=>{
+      console.log(event)
+      this.connectedRadio.voltage = event.batteryMilliVolts
+      m.redraw()
+    })
     this.activeConnection.on(Constants.ResponseCodes.Err, (event)=>{
       //console.log('got response err')
       if (this.waitingForHandshakeCompletion) {
@@ -186,6 +191,8 @@ class RadioStore {
               this.activeConnection.sendToRadioFrame(ackPkt)
             }
             console.log("From: " + decodeResult.data.sender.name + " -> " + decodeResult.data.recipient.name + ": " + decodeResult.data.message)
+            //let tmpSender = AppState.identityManager.getIdentity(decodeResult.data.sender)
+            //let tmpRecipient = AppState.identityManager.getIdentity(decodeResult.data.recipient)
             AppState.messageStore.addDirectMessage(decodeResult.data.sender, decodeResult.data.recipient, decodeResult.data.timestamp, decodeResult.data.message)
           } else {
             console.log('encrypted direct msg', "path=" + bytesToHex(pkt.path), decodeResult.data)
@@ -254,6 +261,10 @@ class RadioStore {
       }
     }
   }
+
+  getVoltage() {
+    this.activeConnection.sendCommandGetBatteryVoltage()
+  }
 }
 
 class Radio {
@@ -265,6 +276,7 @@ class Radio {
   websocketUrl: string
   sendRawPacketSupport: boolean
   autoConnect: boolean
+  voltage: number
 
   parse(data: any) {
     Object.assign(this, data)
