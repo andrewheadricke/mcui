@@ -4,12 +4,13 @@ import AppState from '../lib/appstate'
 import Sidebar from './sidebar'
 import MobileTopBar from './mobiletopbar'
 
-import RadioSection from '../components/radio'
-import MapSection from '../components/map'
-import IdentitiesSection from '../components/identities'
-import DirectSection from '../components/direct'
-import ContactsSection from '../components/contacts'
-import ChannelsSection from '../components/channels'
+import RadioSection from './radio'
+import MapSection from './map'
+import IdentitiesSection from './identities'
+import DirectSection from './direct'
+import ContactsSection from './contacts'
+import ChannelsSection from './channels'
+import MeshtasticSection from './meshtastic'
 import MobileBottomNav from './mobilebottomnav'
 import NeighborsSection from './neighbors'
 import LinksSection from './links'
@@ -46,6 +47,8 @@ let getSectionComponent = function() {
     return RoomsSection
   } else if (AppState.currentSection == "Settings") {
     return SettingsSection
+  } else if (AppState.currentSection == "Meshtastic") {
+    return MeshtasticSection
   }
 }
 

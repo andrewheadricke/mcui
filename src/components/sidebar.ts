@@ -4,6 +4,7 @@ import AppState from '../lib/appstate'
 import { walkieTalkie as svgWalkieTalkie, addressBook as svgAddressBook, broadcastOrig, circle as svgCircle } from './svgs'
 import { hashtag as svgHashtag, comments as svgComments, users as svgUsers, sliders as svgSliders } from './svgs'
 import { map as svgMap, circleNodes as svgCircleNodes, route as svgRoute, userSecret as svgUserSecret } from './svgs'
+import { meshtastic as svgMeshtastic } from './svgs'
 
 export default {
   oninit: (vnode)=>{
@@ -17,6 +18,7 @@ export default {
     vnode.state.sections.push(["Links", svgCircleNodes])
     vnode.state.sections.push(["Traces", svgRoute])
     vnode.state.sections.push(["Rooms", svgUsers])
+    vnode.state.sections.push(["Meshtastic", svgMeshtastic])
 
     vnode.state.showSettingsIcon = "opacity-0"
   },
@@ -29,7 +31,7 @@ export default {
       radioStatusText = "Radio Online"
     }
 
-    return m("aside.hidden md:flex md:flex-col md:w-64 bg-gray-950 border-r border-gray-800",
+    return m("aside.hidden md:flex md:flex-col md:w-64 bg-gray-950 border-r border-gray-800 overflow-auto",
       m("div.p-6 border-b border-gray-800", {onmouseover:()=>vnode.state.showSettingsIcon="opacity-100", onmouseleave:()=>vnode.state.showSettingsIcon="opacity-0"},
         m("h1.text-2xl font-bold text-primary flex items-center gap-3",
           m("span.h-8 w-8 text-mesh", m.trust(broadcastOrig)), "MCui",
@@ -47,6 +49,9 @@ export default {
       m("nav.flex-1 p-4",
         m("ul.space-y-2",
           vnode.state.sections.map((section)=>{
+            if (section[0] == "Meshtastic" && !AppState.meshtastic.hasNodes()) {
+              return
+            }
             let activeClass = ""
             if (section[0] == AppState.currentSection) {
               activeClass = "bg-primary/10 text-primary font-medium"

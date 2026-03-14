@@ -180,6 +180,13 @@ class RadioStore {
             decodeResult.channel.addParticipant(decodeResult.data.sender, decodeResult.data.timestamp)
             AppState.channelManager.saveToLocalStorage()
             AppState.messageStore.addGroupMessage(decodeResult.channel.name, decodeResult.data.sender, decodeResult.data.timestamp, decodeResult.data.message)
+
+            if (decodeResult.channel.name == "#meshtastic") {
+              let advertNode = AppState.meshtastic.parseAdvertFromMsg(decodeResult.data.sender, decodeResult.data.message)
+              if (advertNode != null) {
+                AppState.meshtastic.addOrUpdateNode(advertNode)
+              }
+            }
           } else {
             console.log('encrypted group msg: ', decodeResult.reason)
           }

@@ -5,6 +5,7 @@ import { MessageStore } from "./messagestore";
 import { RadioStore } from "./radiostore";
 import { TraceManager } from "./tracemanager";
 import { RoomManager } from "./roommanager";
+import { Meshtastic } from "./meshtastic";
 
 let hasInit: boolean = false
 let currentSection: string = "Radio"
@@ -21,6 +22,7 @@ let packetLogs: PacketLogs
 let messageStore: MessageStore
 let traceManager: TraceManager
 let roomManager: RoomManager
+let meshtastic: Meshtastic
 
 let init = function() {
   if (hasInit) {
@@ -53,6 +55,11 @@ let init = function() {
   roomManager.init(identityManager)
   storageSize += roomManager.getStorageSize()
 
+  meshtastic = new Meshtastic()
+  meshtastic.init()
+  storageSize += meshtastic.getStorageSize()
+
+
   //console.log(storageSize)
 }
 
@@ -64,10 +71,11 @@ let clearAllData = function() {
   messageStore.clearData()
   traceManager.clearData()
   roomManager.clearData()
+  meshtastic.clearData()
 }
 
 let exportData = function() {
-  let data = {radio: null, identities: null, channels: null, packetLogs: null, messageStore: null, traceManager: null, roomManager: null}
+  let data = {radio: null, identities: null, channels: null, packetLogs: null, messageStore: null, traceManager: null, roomManager: null, meshtastic: null}
   data.radio = radioStore.exportData()
   data.identities = identityManager.exportIdentities()
   data.channels = channelManager.exportData()
@@ -75,6 +83,7 @@ let exportData = function() {
   data.messageStore = messageStore.exportData()
   data.traceManager = traceManager.exportData()
   data.roomManager = roomManager.exportData()
+  data.meshtastic = meshtastic.exportData()
   return data
 }
 
@@ -88,12 +97,13 @@ let importData = function(data) {
   messageStore.importData(data.messageStore)
   traceManager.importData(data.traceManager)
   roomManager.importData(data.roomManager)
+  meshtastic.importData(data.meshtastic)
   window.location.reload();
 }
 
 let setCurrentSection = function(name: string, params: any = {}) {
   if (name == "Radio" || name == "Map" || name == "Identities" || name == "Direct" || name == "Contacts" || name == "Channels" || 
-    name == "Neighbors" || name == "Links" || name == "Traces" || name == "Rooms" || name == "Settings") {
+    name == "Neighbors" || name == "Links" || name == "Traces" || name == "Rooms" || name == "Settings" || name == "Meshtastic") {
     currentSection = name
     currentSectionParams = params
   } else {
@@ -119,6 +129,7 @@ export default {
   get traceManager() { return traceManager },
   get currentSection() { return currentSection },
   get roomManager() { return roomManager },
+  get meshtastic() { return meshtastic },
   setCurrentSection,
   toggleMobileSlideOver,
   get getShowMobileSlideOver() { return showMobileSliderOver },

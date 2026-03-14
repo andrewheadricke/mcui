@@ -28,7 +28,7 @@ class MessageStore {
 
         let remoteIdentity
         let localIdentity
-        if (ident1.hasPrivateKey()) {                  
+        if (ident1 != null && ident1.hasPrivateKey()) {             
           remoteIdentity = ident2
           localIdentity = ident1
         } else {

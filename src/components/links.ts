@@ -1,6 +1,5 @@
 import m from 'mithril'
 import AppState from '../lib/appstate'
-import LinksMap from './linksmap'
 import { map as svgMap, list as svgList } from './svgs'
 import linksmap from './linksmap'
 

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Notification } = require('electron')
+const { app, BrowserWindow, Notification, session } = require('electron')
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -14,6 +14,16 @@ const createWindow = () => {
       }
     }
   })
+
+  const filter = {
+    urls: ['https://*/*']
+  };
+  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    details.requestHeaders['Referer'] = 'https://mcui.canop2p.com';
+    // You can also set an Origin header if needed
+    // details.requestHeaders['Origin'] = 'https://www.your-custom-referer.com';   
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
+  });
 
   win.loadFile('dist/index.html')
   

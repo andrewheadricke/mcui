@@ -125,7 +125,7 @@ export default {
                   if (contact.lat != 0 && contact.lon != 0) {
                     return m("p.text-xs text-gray-500", "Location: ", Math.round(contact.lat / 1000) / 1000, ", ", Math.round(contact.lon / 1000) / 1000)
                   }
-                })()                
+                })()
               )              
             ),
             (()=>{

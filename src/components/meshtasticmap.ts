@@ -78,47 +78,37 @@ export default {
     let allNodes = []
     var markerGroup = L.featureGroup();
     markerGroup.addTo(vnode.state.map);
-    setTimeout(()=>{
-      let nodes = AppState.identityManager.getContacts(false)
-      for (let a = 0; a < nodes.length; a++) {
-        if (typeof nodes[a].lat == 'number' && nodes[a].lat != 0) {
-          let marker = L.marker([nodes[a].lat / 1000000, nodes[a].lon / 1000000]).addTo(markerGroup)
-          marker.bindPopup("<b>" + nodes[a].name + "</b>")
-          marker.bindTooltip(nodes[a].name, {permanent: true, direction : 'bottom', className:"transparent-tooltips", offset:[-15,15]})
-          allNodes.push(nodes[a])
-        }
+    let nodes = AppState.meshtastic.getAllNodes()
+    for (let a = 0; a < nodes.length; a++) {
+      if (nodes[a].location != null) {
+        let marker = L.marker([nodes[a].location[0], nodes[a].location[1]]).addTo(markerGroup)
+        marker.bindPopup("<b>" + nodes[a].longName + "</b>")
+        marker.bindTooltip(nodes[a].shortName, {permanent: true, direction : 'bottom', className:"transparent-tooltips", offset:[-15,15]})
+        allNodes.push(nodes[a])
       }
-      nodes = AppState.identityManager.getMyIdentities()
-      for (let a = 0; a < nodes.length; a++) {
-        if (typeof nodes[a].lat == 'number' && nodes[a].lat != 0) {
-          let marker = L.marker([nodes[a].lat / 1000000, nodes[a].lon / 1000000]).addTo(markerGroup)
-          marker._icon.style.filter = "hue-rotate(150deg)"
-          marker.bindPopup("<b>" + nodes[a].name + "</b>")
-          marker.bindTooltip(nodes[a].name, {permanent: true, direction : 'bottom', className:"transparent-tooltips", offset:[-15,15]})
-          allNodes.push(nodes[a])
-        }
-      }
-      if (markerGroup.getLayers().length > 0) {
-        var bounds = markerGroup.getBounds()
-        vnode.state.map.fitBounds(bounds, { padding: [50, 50] })
-      }
-      
-      const points = featureCollection(
-        allNodes.map(coord => point([coord.lon  / 1000000, coord.lat / 1000000]))
-      );
-      vnode.state.convexHull = convex(points);
+    }
+    if (markerGroup.getLayers().length > 0) {
+      var bounds = markerGroup.getBounds()
+      vnode.state.map.fitBounds(bounds, { padding: [50, 50] })
+    }
+    
+    const points = featureCollection(
+      allNodes.map((coord) => {
+        return point([coord.location[1], coord.location[0]])
+      })
+    );
+    vnode.state.convexHull = convex(points);
 
-      //L.geoJSON(hull, {style: { colorx: 'red' }}).addTo(vnode.state.map);
+    //L.geoJSON(hull, {style: { colorx: 'red' }}).addTo(vnode.state.map);
 
-      if (vnode.state.convexHull != null) {
-        const areaSqMeters = area(vnode.state.convexHull);
-        const areaSqKm = areaSqMeters / 1_000_000;
-        vnode.state.totalArea = numberWithCommas(Math.round(areaSqKm)) + " km²";
+    if (vnode.state.convexHull != null) {
+      const areaSqMeters = area(vnode.state.convexHull);
+      const areaSqKm = areaSqMeters / 1_000_000;
+      vnode.state.totalArea = numberWithCommas(Math.round(areaSqKm)) + " km²";
 
-        setCustomControl(vnode)
-        vnode.state.map.addControl(new vnode.state.customControl);
-      }
-    }, 200)
+      setCustomControl(vnode)
+      vnode.state.map.addControl(new vnode.state.customControl);
+    }
   },
   view: (vnode)=>{
     return m("section.flex flex-col h-full",

@@ -161,7 +161,8 @@ class Channel {
       return
     }
     this.participants.set(name, true)
-    if (timestamp > this.lastMsg) {
+    let nowPlusFive = Math.round(Date.now()/1000) + (5 * 60)
+    if (timestamp > this.lastMsg && timestamp < nowPlusFive) {
       this.lastMsg = timestamp
     }
   }

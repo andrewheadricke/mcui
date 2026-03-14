@@ -63,7 +63,7 @@ let ChannelView = {
                   m("div.inline-block font-blue-200", msg.senderName),
                   m("div.inline-block text-xs ms-1 text-gray-400", formatTimeDifference(msg.timestamp))
                 ),
-                m("div.bg-gray-200 px-2 py-1 rounded-xl text-black", msg.msg),
+                m("div.bg-gray-200 px-2 py-1 rounded-xl text-black", m.trust(msg.msg.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")))
               )
             )
           })
