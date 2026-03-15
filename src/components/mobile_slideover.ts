@@ -1,6 +1,6 @@
 import m from 'mithril'
 import { xmark as svgXmark, circleNodes as svgCircleNodes, route as svgRoute, radio as svgRadio, users as svgUsers, plugCircleCheck as svgPlugCircleCheck } from './svgs'
-import { sliders as svgSliders } from './svgs'
+import { sliders as svgSliders, meshtastic as svgMeshtastic } from './svgs'
 import AppState from '../lib/appstate'
 
 export default {
@@ -49,6 +49,17 @@ export default {
             m("div.inline-block w-6 me-2", m.trust(svgUsers)), 
             m("div.inline-block align-top", "Rooms")
           ),
+          (()=>{
+            if (AppState.meshtastic.hasNodes()) {
+              return m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
+                  AppState.toggleMobileSlideOver()
+                  AppState.setCurrentSection("Meshtastic")
+                }},
+                m("div.inline-block w-6 me-2", m.trust(svgMeshtastic)), 
+                m("div.inline-block align-top", "Meshtastic")
+              )
+            }
+          })(),          
           m("button.nav-btn w-full text-left px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer", {onclick:(e)=>{
               AppState.toggleMobileSlideOver()
               AppState.setCurrentSection("Settings")
