@@ -4,7 +4,12 @@ import { Packet } from "meshcore.js"
 function packetSerialize(pkt: Packet): Uint8Array {
   let buffer_writer = new BufferWriter()
   buffer_writer.writeByte(pkt.header)
-  buffer_writer.writeByte(pkt.path.length)
+  if (pkt.prefixLength == 2) {
+    buffer_writer.writeByte(pkt.path.length + 64)
+  } else {
+    buffer_writer.writeByte(pkt.path.length)
+  }
+  
   if (pkt.path.length > 0) {
     buffer_writer.writeBytes(pkt.path)
   }

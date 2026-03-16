@@ -1,56 +1,85 @@
 import { bytesToHex } from "@noble/hashes/utils.js"
+import { Buffer } from "buffer"
 
 class PacketLogs {
   encryptedPackets: PacketLog[]
   ingressStats: Map<number, IngressStats>
-  links: {link: String, usage: number}
+  links1b: {link: String, usage: number}
+  links2b: {link: String, usage: number}
 
   init() {
     this.encryptedPackets = []
     this.ingressStats = new Map<number, IngressStats>
-    this.links = {} as {link: String, usage: number}
+    this.links1b = {} as {link: String, usage: number}
+    this.links2b = {} as {link: String, usage: number}
 
-    let tmpLinks = localStorage.getItem("links")
+    let tmpLinks = localStorage.getItem("links1b")
     if (tmpLinks != null) {
-      this.links = JSON.parse(tmpLinks)
+      this.links1b = JSON.parse(tmpLinks)
+    }
+    tmpLinks = localStorage.getItem("links2b")
+    if (tmpLinks != null) {
+      this.links2b = JSON.parse(tmpLinks)
     }
   }
 
   getStorageSize(): number {
-    let tmpJson = localStorage.getItem("links")
-    if (tmpJson == null) {
-      return 0
-    } else {
-      return tmpJson.length
+    let l1: number, l2: number
+    let tmpJson = localStorage.getItem("links1b")
+    if (tmpJson != null) {
+      l1 = tmpJson.length
     }
+    tmpJson = localStorage.getItem("links2b")
+    if (tmpJson != null) {
+      l2 = tmpJson.length
+    }
+    return l1 + l2
   }
 
-  addLinks(path: Uint8Array) {
+  addLinks(path: Uint8Array, prefixLength: number) {
     if (path.length < 2) {
       return
     }
-    for (let a = 0; a < path.length - 1; a++) {
-      if (path[a] == path[a+1]) {
-        continue
-      }
+    //console.log(path, prefixLength)
+    for (let a = 0; a <= path.length - (prefixLength * 2); a+=prefixLength) {
+      let hashA = Buffer.from(path.slice(a, a + prefixLength))
+      let hashB = Buffer.from(path.slice(a + prefixLength, a + prefixLength + prefixLength))
+      //console.log(hashA, hashB)
       let key: string
-      if (path[a] < path[a+1]) {
-        key = bytesToHex(path.slice(a, a+1)) + bytesToHex(path.slice(a+1, a+2))
+      let cmpResult = Buffer.compare(hashA, hashB)
+      if (cmpResult == 0) {
+        continue
+      } else if (cmpResult == 1) {
+        key = hashB.toString('hex') + hashA.toString('hex')
       } else {
-        key = bytesToHex(path.slice(a+1, a+2)) + bytesToHex(path.slice(a, a+1))
+        key = hashA.toString('hex') + hashB.toString('hex')
       }
-      if (key in this.links) {
-        this.links[key] = this.links[key] + 1
-      } else {
-        this.links[key] = 1
+      //console.log('key', key)
+      if (prefixLength == 1) {
+        if (key in this.links1b) {
+          this.links1b[key] = this.links1b[key] + 1
+        } else {
+          this.links1b[key] = 1
+        }
+      } else if (prefixLength == 2) {
+        if (key in this.links2b) {
+          this.links2b[key] = this.links2b[key] + 1
+        } else {
+          this.links2b[key] = 1
+        }
       }
     }
     //console.log(this)
   }
 
-  iterateLinks(cb: (link: string, usage: number) => any) {
+  iterateLinks(hashMode: number, cb: (link: string, usage: number) => any) {
     let returnValues: any = []
-    let sortedLinks: any[] = Object.entries(this.links);
+    let sortedLinks: any[]
+    if (hashMode == 0) {
+      sortedLinks = Object.entries(this.links1b);
+    } else if (hashMode == 1) {
+      sortedLinks = Object.entries(this.links2b);
+    }
     sortedLinks.sort((a, b)=> b[1] - a[1])
 
     sortedLinks.forEach((link)=>{
@@ -64,11 +93,15 @@ class PacketLogs {
   }
 
   saveToLocalStorage() {
-    localStorage.setItem("links", JSON.stringify(this.exportData()))
+    localStorage.setItem("links1b", JSON.stringify(this.links1b))
+    localStorage.setItem("links2b", JSON.stringify(this.links2b))
   }
 
   clearData() {
-    this.links = {} as {link: String, usage: number}
+    this.links1b = {} as {link: String, usage: number}
+    localStorage.removeItem("links1b")
+    this.links2b = {} as {link: String, usage: number}
+    localStorage.removeItem("links2b")
     localStorage.removeItem("links")
   }
 
@@ -79,7 +112,7 @@ class PacketLogs {
   }
 
   exportData() {
-    return this.links
+    return {links1b: this.links1b, links2b: this.links2b}
   }
 
   addEncryptedPacket(path: Uint8Array, rawPkt: Uint8Array) {

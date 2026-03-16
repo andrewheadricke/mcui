@@ -21,6 +21,7 @@ let newTraceCard = {
     vnode.state.onCardClick = onCardClick(vnode)
     vnode.state.draftName = ""
     vnode.state.draftPath = ""
+    vnode.state.draftPrefixLength = "1"
     vnode.state.showNewTraceForm = false
 
     Object.seal(vnode.state)
@@ -39,14 +40,17 @@ let newTraceCard = {
             m("div", m("input.text-black rounded px-3 py-1 w-full", {type:"text", oninput: (e)=>vnode.state.draftName=e.target.value, value: vnode.state.draftName})),
             m("div.mt-1", "Path (hex)"),
             m("div", m("input.text-black rounded px-3 py-1 w-full", {type:"text", oninput: (e)=>vnode.state.draftPath=e.target.value, value: vnode.state.draftPath})),
+            m("div.mt-1", "Prefix length"),
+            m("div", m("input.text-black rounded px-3 py-1 w-full", {type:"text", oninput: (e)=>vnode.state.draftPrefixLength=e.target.value, value: vnode.state.draftPrefixLength})),
             m("button.bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-full mt-2 cursor-pointer", {onclick:(e)=>{
               if (vnode.state.draftName == "" || vnode.state.draftPath == "") {
                 console.log("missing values")
                 return
               }
-              AppState.traceManager.addTrace(vnode.state.draftName, vnode.state.draftPath)
+              AppState.traceManager.addTrace(vnode.state.draftName, vnode.state.draftPath, parseInt(vnode.state.draftPrefixLength))
               vnode.state.draftName = ""
               vnode.state.draftPath = ""
+              vnode.state.draftPrefixLength = ""
               vnode.state.showNewTraceForm = false
               vnode.state.onCardClick = onCardClick(vnode)
               vnode.state.pointer = "cursor-pointer"

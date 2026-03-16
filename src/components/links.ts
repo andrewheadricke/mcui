@@ -1,15 +1,22 @@
 import m from 'mithril'
 import AppState from '../lib/appstate'
-import { map as svgMap, list as svgList } from './svgs'
+import { map as svgMap, list as svgList, hashtag as svgHashtag } from './svgs'
 import linksmap from './linksmap'
+import { Buffer } from 'buffer'
 
 let linksList = {
   view: (vnode)=>{
-    return AppState.packetLogs.iterateLinks((link, usage)=>{
-      let nodeAByte = parseInt(link.substring(0, 2), 16);
-      let nodeBByte = parseInt(link.substring(2, 4), 16);
-      let nodeA = AppState.identityManager.getRepeatersByFirstByte(nodeAByte)
-      let nodeB = AppState.identityManager.getRepeatersByFirstByte(nodeBByte)        
+    return AppState.packetLogs.iterateLinks(vnode.attrs.hashMode, (link, usage)=>{
+      let nodeAPrefix, nodeBPrefix: Buffer
+      if (vnode.attrs.hashMode == 0) {
+        nodeAPrefix = Buffer.from(link.substring(0, 2), 'hex');
+        nodeBPrefix = Buffer.from(link.substring(2, 4), 'hex');
+      } else if (vnode.attrs.hashMode == 1) {
+        nodeAPrefix = Buffer.from(link.substring(0, 4), 'hex');
+        nodeBPrefix = Buffer.from(link.substring(4, 8), 'hex');
+      }
+      let nodeA = AppState.identityManager.getRepeatersByPrefix(nodeAPrefix)
+      let nodeB = AppState.identityManager.getRepeatersByPrefix(nodeBPrefix)
       let nodeAtxt = nodeA.map((n)=>n.name).join(", ")
       let nodeBtxt = nodeB.map((n)=>n.name).join(", ")
 
@@ -52,6 +59,7 @@ export default {
 
   oninit: (vnode)=>{
     vnode.state.viewMode = "list"
+    vnode.state.hashMode = 0
     vnode.state.hidePoorLinks = ""
   },
   view: (vnode)=>{
@@ -60,7 +68,16 @@ export default {
       m("h2.text-2xl md:text-3xl font-bold " + padding,
         "Links",
         m("div.inline-flex ms-5 text-base text-gray-500 font-normal shadow-xs -space-x-px",
-          m("button.inline-flex items-center text-body bg-neutral-primary-soft border rounded rounded-r-none hover:bg-gray-800 focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-s-base text-sm px-3 py-2 focus:outline-none cursor-pointer", {onclick:(e)=>vnode.state.viewMode="list"},
+          m("button.inline-flex items-center text-body bg-neutral-primary-soft border rounded rounded-r-none hover:bg-gray-800 focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-s-base text-sm px-3 py-2 focus:outline-none cursor-pointer", {onclick:(e)=>{
+            if (vnode.state.hashMode == 0) {
+              vnode.state.hashMode = 1
+            } else {
+              vnode.state.hashMode = 0
+            }
+          }},
+            m("span.w-5 me-2", m.trust(svgHashtag)), "Hash"
+          ),
+          m("button.inline-flex items-center text-body bg-neutral-primary-soft border rounded rounded-l-none rounded-r-none hover:bg-gray-800 focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-s-base text-sm px-3 py-2 focus:outline-none cursor-pointer", {onclick:(e)=>vnode.state.viewMode="list"},
             m("span.w-5 me-2", m.trust(svgList)), "List"
           ),
           m("button.inline-flex items-center text-body bg-neutral-primary-soft border rounded rounded-l-none hover:bg-gray-800 focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-s-base text-sm px-3 py-2 focus:outline-none cursor-pointer", {onclick:(e)=>vnode.state.viewMode="map"},
@@ -80,9 +97,9 @@ export default {
       ),
       (()=>{
         if (vnode.state.viewMode == "list") {
-          return m("div." + padding + " pt-0", m(linksList))
+          return m("div." + padding + " pt-0", m(linksList, {hashMode: vnode.state.hashMode}))
         } else {
-          return m("div.pt-6 flex-1", m(linksmap, {hidePoorLinks: vnode.state.hidePoorLinks}))
+          return m("div.pt-6 flex-1", m(linksmap, {hashMode: vnode.state.hashMode, hidePoorLinks: vnode.state.hidePoorLinks}))
         }
       })()      
     )

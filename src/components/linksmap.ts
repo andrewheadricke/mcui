@@ -2,6 +2,7 @@ import m from 'mithril'
 import L from 'leaflet'
 import AppState from '../lib/appstate'
 import { greenToRedViaYellow } from '../lib/utils'
+import { Buffer } from 'buffer'
 
 let loadLinksOntoMap = function(vnode) {
 
@@ -47,41 +48,53 @@ let loadLinksOntoMap = function(vnode) {
   }  
 }
 
+let loadLinksFromPacketLogs = function(vnode) {
+  vnode.state.links = AppState.packetLogs.iterateLinks(vnode.attrs.hashMode, (link, usage)=>{
+    let nodeAPrefix, nodeBPrefix: Buffer
+    if (vnode.attrs.hashMode == 0) {
+      nodeAPrefix = Buffer.from(link.substring(0, 2), 'hex');
+      nodeBPrefix = Buffer.from(link.substring(2, 4), 'hex');
+    } else if (vnode.attrs.hashMode == 1) {
+      nodeAPrefix = Buffer.from(link.substring(0, 4), 'hex');
+      nodeBPrefix = Buffer.from(link.substring(4, 8), 'hex');
+    }
+    let nodeA = AppState.identityManager.getRepeatersByPrefix(nodeAPrefix)
+    let nodeB = AppState.identityManager.getRepeatersByPrefix(nodeBPrefix)
+
+    if (usage > vnode.state.maxUsage) {
+      vnode.state.maxUsage = usage
+    }
+
+    let nodeAHasCoords, nodeBHasCoords      
+
+    let nodeALoc, nodeBLoc
+    if (nodeA.length == 1) {
+      nodeALoc = [ nodeA[0].lat / 1000000, nodeA[0].lon / 1000000 ]
+      if (nodeA[0].lat != 0 && nodeA[0].lon != 0) {
+        nodeAHasCoords = true
+      }
+    }
+    if (nodeB.length == 1) {
+      nodeBLoc = [ nodeB[0].lat / 1000000, nodeB[0].lon / 1000000 ]
+      if (nodeB[0].lat != 0 && nodeB[0].lon != 0) {
+        nodeBHasCoords = true
+      }
+    }
+
+    if (nodeAHasCoords && nodeBHasCoords) {
+      return {nodeA: nodeALoc, nodeB: nodeBLoc, usage: usage, nodeAName: nodeA[0].name, nodeBName: nodeB[0].name}
+    }
+  })
+}
+
 export default {
   oninit: (vnode)=>{
     vnode.state.maxUsage = 0
     vnode.state.pathGroup = null
     vnode.state.boundsSet = false
-    vnode.state.links = AppState.packetLogs.iterateLinks((link, usage)=>{
-      let nodeAByte = parseInt(link.substring(0, 2), 16);
-      let nodeBByte = parseInt(link.substring(2, 4), 16);
-      let nodeA = AppState.identityManager.getRepeatersByFirstByte(nodeAByte)
-      let nodeB = AppState.identityManager.getRepeatersByFirstByte(nodeBByte)
-
-      if (usage > vnode.state.maxUsage) {
-        vnode.state.maxUsage = usage
-      }
-
-      let nodeAHasCoords, nodeBHasCoords      
-
-      let nodeALoc, nodeBLoc
-      if (nodeA.length == 1) {
-        nodeALoc = [ nodeA[0].lat / 1000000, nodeA[0].lon / 1000000 ]
-        if (nodeA[0].lat != 0 && nodeA[0].lon != 0) {
-          nodeAHasCoords = true
-        }
-      }
-      if (nodeB.length == 1) {
-        nodeBLoc = [ nodeB[0].lat / 1000000, nodeB[0].lon / 1000000 ]
-        if (nodeB[0].lat != 0 && nodeB[0].lon != 0) {
-          nodeBHasCoords = true
-        }
-      }
-
-      if (nodeAHasCoords && nodeBHasCoords) {
-        return {nodeA: nodeALoc, nodeB: nodeBLoc, usage: usage, nodeAName: nodeA[0].name, nodeBName: nodeB[0].name}
-      }
-    })
+    vnode.state.lastHashMode = vnode.attrs.hashMode
+    
+    loadLinksFromPacketLogs(vnode)
   },
   oncreate: (vnode)=>{
     
@@ -99,6 +112,10 @@ export default {
     loadLinksOntoMap(vnode)
   },
   onupdate: (vnode)=>{
+    if (vnode.state.lastHashMode != vnode.attrs.hashMode) {
+      loadLinksFromPacketLogs(vnode)
+      vnode.state.lastHashMode = vnode.attrs.hashMode
+    }
     loadLinksOntoMap(vnode)
   },
   view: (vnode)=>{

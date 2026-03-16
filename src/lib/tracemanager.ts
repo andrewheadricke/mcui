@@ -30,10 +30,11 @@ class TraceManager {
     }
   }
   
-  addTrace(name: string, path: string) {
+  addTrace(name: string, path: string, prefixLength: number) {
     let newTrace = new Trace()
     newTrace.name = name
     newTrace.path = path
+    newTrace.prefixLength = prefixLength
 
     this.traces.push(newTrace)
 
@@ -139,6 +140,7 @@ class TraceManager {
 
 class Trace {
   name: string
+  prefixLength: number = 1
   path: string
   fails: number = 0
   successes: number = 0
@@ -151,23 +153,30 @@ class Trace {
     let t = new Trace()
     t.name = data.name
     t.path = data.path
+    t.prefixLength = data.prefixLength
     t.fails = data.fails
     t.successes = data.successes
 
-    t._hops = t.path.length / 2
+    t._hops = (t.path.length / 2) / t.prefixLength
     return t
   }
 
   startTrace(tag: Uint8Array, pendingTraceMeta: [Trace, number, (value: unknown)=>void]) {
+    //console.log(this)
     this._traceActive = true
-    let waitTime = (this.path.length / 2) + 1
+    let waitTime = ((this.path.length / 2) / this.prefixLength) + 1
 
     console.log('waiting', waitTime * 2, "seconds")
 
     const bufferWriter = new BufferWriter();
     bufferWriter.writeBytes(tag);
     bufferWriter.writeUInt32LE(0); // auth
-    bufferWriter.writeByte(0) // flags
+
+    let flags = 0x00
+    if (this.prefixLength == 2) {
+      flags = (flags & ~0x03) | (1 & 0x03);
+    }
+    bufferWriter.writeByte(flags) // flags
 
     let pathBytes = hexToBytes(this.path)
     bufferWriter.writeBytes(pathBytes) // path
@@ -179,7 +188,7 @@ class Trace {
     header |= (Packet.PAYLOAD_TYPE_TRACE & Packet.PH_TYPE_MASK) << Packet.PH_TYPE_SHIFT;
     header |= (version   & Packet.PH_VER_MASK)  << Packet.PH_VER_SHIFT;
 
-    let pkt = new Packet(header, [0,0], 0, payload)
+    let pkt = new Packet(header, [0,0], this.prefixLength, 0, payload)
     let pktBytes = packetSerialize(pkt)
 
     const data = new Uint8Array(pktBytes.length + 1);

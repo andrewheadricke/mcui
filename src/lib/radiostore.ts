@@ -150,6 +150,8 @@ class RadioStore {
     this.activeConnection.on(Constants.PushCodes.TraceData, (event)=>{
       //console.log('TraceData', event)
       AppState.traceManager.traceComplete(event)
+      AppState.packetLogs.addLinks(event.pathHashes, event.prefixLen)
+      AppState.packetLogs.saveToLocalStorage()
     })
     this.activeConnection.on(Constants.PushCodes.LogRxData, async (event) => {
       //console.log("LogRxData", event)
@@ -226,7 +228,7 @@ class RadioStore {
   
       // add ingress path tracking
       AppState.packetLogs.addIngressPacket(pkt.getRouteTypeString(), pkt.path, srcHashForPathIngress)
-      AppState.packetLogs.addLinks(pkt.path)
+      AppState.packetLogs.addLinks(pkt.path, pkt.prefixLength)
       AppState.packetLogs.saveToLocalStorage()
   
       //console.log(payload)

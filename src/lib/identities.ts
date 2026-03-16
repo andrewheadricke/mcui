@@ -6,6 +6,7 @@ import { Packet } from 'meshcore.js'
 import { packetSerialize } from "./packet_helper";
 import fnv1a from "fnv1a"
 import { hslToRgb } from './utils'
+import { Buffer } from "buffer"
 
 class IdentityManager {
 
@@ -249,6 +250,17 @@ class IdentityManager {
     let results: Identity[] = []
     this.identities.forEach((ident)=>{
       if (ident.publicKey[0] == firstByte && ident.type == "REPEATER") {
+        results.push(ident)
+      }
+    })
+    return results
+  }
+
+  getRepeatersByPrefix(prefix: Buffer): Identity[] {
+    let results: Identity[] = []
+    this.identities.forEach((ident)=>{
+      let pubKeyPrefix: Buffer = Buffer.from(ident.publicKey).subarray(0, prefix.length) as Buffer
+      if (pubKeyPrefix.equals(prefix) && ident.type == "REPEATER") {
         results.push(ident)
       }
     })
