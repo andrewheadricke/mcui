@@ -106,6 +106,8 @@ class IdentityManager {
       if (existingIdentity.firstSeen == null || existingIdentity.firstSeen == 0) {
         existingIdentity.firstSeen = existingIdentity.lastSeen || Math.round(Date.now()/1000)
       }
+      existingIdentity.advertPath = advert.getPathAsString()
+      existingIdentity.pathHashMode = advert.pathHashMode
       //console.log(existingIdentity)
     } else {
       let i = new Identity()
@@ -123,6 +125,9 @@ class IdentityManager {
 
       let fnv = fnv1a(i.name)
       i._rgb = hslToRgb(fnv, 0.6, 0.5)
+      i.advertPath = advert.getPathAsString()
+      i.pathHashMode = advert.pathHashMode
+      //console.log(i)
 
       this.identities.push(i)
       if (i.privateKey != null) {
@@ -256,6 +261,17 @@ class IdentityManager {
     return results
   }
 
+  getRepeatersByPrefixHex(prefix: string): Identity[] {
+    let results: Identity[] = []
+    this.identities.forEach((ident)=>{
+      let pubKeyPrefix = ident.getPublicKeyHex();
+      if (pubKeyPrefix.startsWith(prefix) && ident.type == "REPEATER") {
+        results.push(ident)
+      }
+    })
+    return results
+  }
+
   getRepeatersByPrefix(prefix: Buffer): Identity[] {
     let results: Identity[] = []
     this.identities.forEach((ident)=>{
@@ -314,9 +330,9 @@ class Identity {
   firstSeen: number
   lastSeen: number
   transportMethod: string
-  hops: number
   type: string
   advertPath: string
+  pathHashMode: number
   autoAck: boolean = false
 
   _rgb: string
@@ -346,9 +362,9 @@ class Identity {
       this.name = ""
     }
     this.transportMethod = identityObj.transportMethod
-    this.hops = identityObj.hops
     this.type = identityObj.type
     this.advertPath = identityObj.advertPath
+    this.pathHashMode = identityObj.pathHashMode
     if (identityObj.autoAck != null) {
       this.autoAck = identityObj.autoAck
     }
@@ -379,6 +395,18 @@ class Identity {
     } else if (this.type == "ROOM") {
       return 3
     }
+  }
+
+  hasCoords(): boolean {
+    if (this.lat != null && this.lon != null && this.lat != 0 && this.lon != 0) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  getCoords(): [number, number] {
+    return [ this.lat / 1000000, this.lon / 1000000 ]
   }
 
   updateRgb() {
@@ -459,7 +487,7 @@ class Identity {
     header |= (type      & Packet.PH_TYPE_MASK) << Packet.PH_TYPE_SHIFT;
     header |= (version   & Packet.PH_VER_MASK)  << Packet.PH_VER_SHIFT;
 
-    let pkt = new Packet(header, [0,0], 0, advert.getBytesForPayload())
+    let pkt = new Packet(header, [0,0], 2, [], advert.getBytesForPayload())
     //console.log(pkt)
 
     return packetSerialize(pkt)

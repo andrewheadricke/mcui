@@ -39,6 +39,14 @@
   border: 1px solid white;
 }
 
+.ambiguous-marker {
+  background-color: blue;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  border: 1px solid white;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }

@@ -2,6 +2,7 @@ import * as ed25519 from "@noble/ed25519"
 import BufferReader from "./buffer_reader";
 import BufferWriter from "./buffer_writer";
 import { Ed25519SignatureVerifier } from './ed25519verifier'
+import { bytesToHex } from "@noble/hashes/utils.js";
 
 export enum DeviceRole {
   ChatNode = 0x01,
@@ -45,6 +46,8 @@ class Advert {
     timestamp: number
     signature: Uint8Array
     appData: AppData
+    path: Uint8Array
+    pathHashMode: number
 
     static buildAdvertFromScratch(publicKey: Uint8Array, timestamp: number, deviceRole: DeviceRole, name: string): Advert {
       let a = new Advert()
@@ -169,6 +172,19 @@ class Advert {
         this.appData.name = bufferReader.readString();
       }
 
+    }
+
+    updatePathInfo(path: Uint8Array, pathHashMode: number) {
+      this.path = path
+      this.pathHashMode = pathHashMode
+    }
+
+    getPathAsString(): string {
+      let final: string = ""
+      for (let a = 0; a < this.path.length; a+=this.pathHashMode+1) {
+        final += bytesToHex(this.path.subarray(a, a + this.pathHashMode+1)) + ","
+      }
+      return final.substring(0, final.length - 1)
     }
 }
 

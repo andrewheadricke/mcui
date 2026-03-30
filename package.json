@@ -1,6 +1,7 @@
 {
   "name": "mcui",
-  "version": "0.2.2",
+  "desktopName": "mcui",
+  "version": "0.2.3",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -27,7 +28,7 @@
     "meshcore.js": "file:../meshcore.js/",
     "mithril": "^2.3.7",
     "qrcode": "^1.5.4",
-    "tailwindcss": "^4.1.16"
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "replace": "^0.2.2",

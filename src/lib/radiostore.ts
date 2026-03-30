@@ -163,6 +163,7 @@ class RadioStore {
       if (pkt.payload_type == Packet.PAYLOAD_TYPE_ADVERT) {
         let payload: any = pkt.parsePayload()
         const advert = await Advert.fromBytes(pkt.payload);
+        advert.updatePathInfo(pkt.path, pkt.prefixLength - 1)
         //console.log(advert)
 
         if (payload.app_data.name == null || payload.app_data.name[0] == "\u0000") {
@@ -171,7 +172,7 @@ class RadioStore {
         } else {
           console.log("Advert from", payload.app_data.name)
           AppState.identityManager.addOrUpdate(advert)
-          srcHashForPathIngress = advert.publicKey          
+          srcHashForPathIngress = advert.publicKey
         }        
       } else if (pkt.payload_type == Packet.PAYLOAD_TYPE_TXT_MSG || pkt.payload_type == Packet.PAYLOAD_TYPE_GRP_TXT) {
         let decodeResult: any = {}

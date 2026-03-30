@@ -1,11 +1,12 @@
 import m from 'mithril'
 import { towerCell as svgTowerCell, commentDots as svgCommentDots, trash as svgTrash, users as svgUsers, cog as svgCog, map as svgMap } from './svgs'
-import { qrcode as svgQrcode } from './svgs'
+import { qrcode as svgQrcode, circleNodes as svgCircleNodes } from './svgs'
 import AppState from '../lib/appstate'
 import { formatTimeDifference } from "../lib/utils"
 import ContactFilters from "./contactfilters"
 import LocationChooser from './location_chooser'
 import qrcode from 'qrcode'
+import AdvertPathViewer from './advertpathviewer'
 
 const dropdownContact = {
   view: (vnode: any)=>{
@@ -33,6 +34,19 @@ const dropdownContact = {
             })
             vnode.attrs.onClose()
           }}, m("div.inline-block w-5 me-1", m.trust(svgMap)), m("div.inline-block align-top", " Set Location"))
+        ),
+        m("li.min-h-10",
+          m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:()=>{
+            AppState.setActiveModal({
+              view:()=>m(AdvertPathViewer, {
+                contactNode: vnode.attrs.contact,
+                onClose: ()=>{
+                  AppState.setActiveModal(null)
+                }
+              })
+            })
+            vnode.attrs.onClose()
+          }}, m("div.inline-block w-5 me-1", m.trust(svgCircleNodes)), m("div.inline-block align-top", " View Advert Path"))
         ),
         m("li.min-h-10",
           m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:async ()=>{
@@ -125,6 +139,36 @@ export default {
                   if (contact.lat != 0 && contact.lon != 0) {
                     return m("p.text-xs text-gray-500", "Location: ", Math.round(contact.lat / 1000) / 1000, ", ", Math.round(contact.lon / 1000) / 1000)
                   }
+                })(),
+                (()=>{
+                  let els = []                  
+                  if (typeof contact.advertPath == 'string') {
+                    let hopLength = "Direct"
+                    if (contact.advertPath.length > 0) {
+                      hopLength = contact.advertPath.split(",").length.toString()
+                    }
+
+                    els.push(m("div.inline text-xs text-gray-500 me-5 align-top", "Hops: ", hopLength))
+                  }
+                  let byteMode = (contact.pathHashMode + 1) + " byte prefix"
+                  let byteColor, byteTextColor, byteRingColor: string
+                  if (contact.pathHashMode == 0) {
+                    byteColor = "bg-gray-500/10"
+                    byteRingColor = "ring-gray-500"
+                    byteTextColor = "text-gray-500"
+                  } else if (contact.pathHashMode == 1) {
+                    byteColor = "bg-cyan-500"
+                    byteRingColor = "ring-cyan-300"
+                    byteTextColor = "text-white"
+                  } else {
+                    byteColor = "bg-orange-500"
+                    byteRingColor = "ring-orange-300"
+                    byteTextColor = "text-white"
+                  }
+                  if (contact.pathHashMode != null) {
+                    els.push(m("div.inline-flex items-center rounded-md " + byteColor + " px-1 py-0 text-xs font-small " + byteTextColor + " ring-1 " + byteRingColor, byteMode ))
+                  }
+                  return els
                 })()
               )              
             ),
