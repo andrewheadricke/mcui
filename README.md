@@ -31,8 +31,8 @@ npx vite build
 ```
 
 ### Ways to use/install this app
-* Hosted or self hosted website (https://mcui.canop2p.com)
-* Installed PWA for Desktop & Phone (https://mcui.canop2p.com)
+* Hosted or self hosted website (https://mcui.canop2p.net)
+* Installed PWA for Desktop & Phone (https://mcui.canop2p.net)
 * Android wrapped webview app (https://zapstore.dev/apps/naddr1qvzqqqr7pvpzp0m4lv26wskze24h697t8m0euacr9hyj2fzgwkey2sg2ms5ljhkhqqgxxmmd9e3kzmn0wqe8qtndvd6kjn7cd92)
 * Electron (raw html files, bundled asar, or a full electron bundle)
 
