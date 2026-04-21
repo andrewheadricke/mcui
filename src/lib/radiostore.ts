@@ -155,6 +155,7 @@ class RadioStore {
     })
     this.activeConnection.on(Constants.PushCodes.LogRxData, async (event) => {
       //console.log("LogRxData", event)
+      //console.log("LogRxData", bytesToHex(event.raw))
 
       let pkt: any = Packet.fromBytes(event.raw)
       let srcHashForPathIngress: Uint8Array | null = null

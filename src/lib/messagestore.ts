@@ -176,6 +176,11 @@ class MessageStore {
     return this.messages
   }*/
 
+  removeDirectChat(key: string) {
+    delete this.directMessages[key]
+    this.saveToLocalStorage()
+  }
+
   getMessagesFor(channelName): Message[] {
     if (this.groupMessages.hasOwnProperty(channelName)) {
       return this.groupMessages[channelName]

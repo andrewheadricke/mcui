@@ -476,6 +476,10 @@ class Identity {
       deviceRole = DeviceRole.Repeater
     }
     let advert = Advert.buildAdvertFromScratch(this.publicKey, Math.floor(Date.now()/1000), deviceRole, this.name)
+    //console.log(advert)
+    if (this.lat != 0 && this.lon != 0) {
+      advert.addLocation(this.lat, this.lon)
+    }
     advert.signature = this.sign(advert.getBytesForSignature())
     
     //console.log(advert)

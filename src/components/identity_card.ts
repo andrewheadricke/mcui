@@ -1,10 +1,11 @@
 import m from 'mithril'
 import { formatTimeDifference } from "../lib/utils"
 import { key as svgKey, cog as svgCog, edit as svgEdit, circleCheck as svgCircleCheck, save as svgSave, broadcast as svgBroadcast, users as svgUsers } from './svgs'
-import { satellite as svgSatellite, trash as svgTrash } from './svgs'
+import { satellite as svgSatellite, trash as svgTrash, towerCell as svgTowerCell, map as svgMap } from './svgs'
 import AppState from '../lib/appstate'
 import { Packet } from "meshcore.js"
 import { bytesToHex } from '@noble/hashes/utils.js'
+import LocationChooser from './location_chooser'
 
 const dropdownIdentity = {
   view: (vnode: any)=>{
@@ -55,6 +56,8 @@ const dropdownIdentity = {
                 m("a.block px-4 py-2 hover:bg-gray-100", {href:"#", onclick: async ()=>{
                   let identity = AppState.identityManager.getIdentity(vnode.attrs.publicKey)
                   let pkt = await identity.buildAdvertPacket(Packet.ROUTE_TYPE_FLOOD)
+
+                  //console.log(pkt)
       
                   const data = new Uint8Array(pkt.length + 1);
                   data[0] = 53
@@ -72,6 +75,30 @@ const dropdownIdentity = {
                   identity.type = "ROOM"
                   AppState.identityManager.saveIdentities()
                 }}, m("div.inline-block", {style:"width:20px;height:20px;"}, m.trust(svgUsers)), m("div.inline-block align-top ms-1", "Set Room Server"))
+              ),
+              m("li",
+                m("a.block px-4 py-2 hover:bg-gray-100", {href:"#", onclick: async ()=>{
+                  let identity = AppState.identityManager.getIdentity(vnode.attrs.publicKey)
+                  identity.type = "REPEATER"
+                  AppState.identityManager.saveIdentities()
+                }}, m("div.inline-block", {style:"width:20px;height:20px;"}, m.trust(svgTowerCell)), m("div.inline-block align-top ms-1", "Set Repeater"))
+              ),
+              m("li.min-h-10",
+                m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:()=>{
+                  AppState.setActiveModal({
+                    view:()=>m(LocationChooser, {
+                      onClose: ()=>{
+                        AppState.setActiveModal(null)
+                      }, onSave:(lat, lon)=>{
+                        let identity = AppState.identityManager.getIdentity(vnode.attrs.publicKey)
+                        identity.lat = lat
+                        identity.lon = lon
+                        AppState.identityManager.saveIdentities()
+                        AppState.setActiveModal(null)
+                      }
+                    })
+                  })
+                }}, m("div.inline-block w-5 me-1", m.trust(svgMap)), m("div.inline-block align-top", " Set Location"))
               ),
               m("li",
                 m("a.block px-4 py-2 hover:bg-gray-100", {href:"#", onclick: async ()=>{

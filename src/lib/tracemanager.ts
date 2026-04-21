@@ -172,14 +172,15 @@ class Trace {
     bufferWriter.writeBytes(tag);
     bufferWriter.writeUInt32LE(0); // auth
 
-    let flags = 0x00
     if (this.prefixLength == 2) {
-      flags = (flags & ~0x03) | (1 & 0x03);
+      bufferWriter.writeByte(1); // flag
+    } else {
+      bufferWriter.writeByte(0); // flag
     }
-    bufferWriter.writeByte(flags) // flags
 
     let pathBytes = hexToBytes(this.path)
-    bufferWriter.writeBytes(pathBytes) // path
+    
+    bufferWriter.writeBytes(pathBytes) // path goes in as payload
     let payload = bufferWriter.toBytes()
 
     let header = 0
@@ -188,7 +189,7 @@ class Trace {
     header |= (Packet.PAYLOAD_TYPE_TRACE & Packet.PH_TYPE_MASK) << Packet.PH_TYPE_SHIFT;
     header |= (version   & Packet.PH_VER_MASK)  << Packet.PH_VER_SHIFT;
 
-    let pkt = new Packet(header, [0,0], this.prefixLength, 0, payload)
+    let pkt = new Packet(header, [0,0], this.prefixLength, pathBytes, payload)
     let pktBytes = packetSerialize(pkt)
 
     const data = new Uint8Array(pktBytes.length + 1);

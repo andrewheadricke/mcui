@@ -50,16 +50,16 @@ let loadLinksOntoMap = function(vnode) {
 
 let loadLinksFromPacketLogs = function(vnode) {
   vnode.state.links = AppState.packetLogs.iterateLinks(vnode.attrs.hashMode, (link, usage)=>{
-    let nodeAPrefix, nodeBPrefix: Buffer
+    let nodeAPrefix, nodeBPrefix: string
     if (vnode.attrs.hashMode == 0) {
-      nodeAPrefix = Buffer.from(link.substring(0, 2), 'hex');
-      nodeBPrefix = Buffer.from(link.substring(2, 4), 'hex');
+      nodeAPrefix = link.substring(0, 2)
+      nodeBPrefix = link.substring(2, 4)
     } else if (vnode.attrs.hashMode == 1) {
-      nodeAPrefix = Buffer.from(link.substring(0, 4), 'hex');
-      nodeBPrefix = Buffer.from(link.substring(4, 8), 'hex');
+      nodeAPrefix = link.substring(0, 4)
+      nodeBPrefix = link.substring(4, 8)
     }
-    let nodeA = AppState.identityManager.getRepeatersByPrefix(nodeAPrefix)
-    let nodeB = AppState.identityManager.getRepeatersByPrefix(nodeBPrefix)
+    let nodeA = AppState.identityManager.getRepeatersByPrefixHex(nodeAPrefix)
+    let nodeB = AppState.identityManager.getRepeatersByPrefixHex(nodeBPrefix)
 
     if (usage > vnode.state.maxUsage) {
       vnode.state.maxUsage = usage

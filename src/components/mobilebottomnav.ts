@@ -20,7 +20,7 @@ export default {
             colorClass = "text-primary"
           }
           return m("button.mobile-nav-btn flex flex-col items-center py-2 px-3 hover:bg-gray-800 cursor-pointer " + colorClass, {onclick:(e)=>{
-              AppState.setCurrentSection(section[0])
+              AppState.setCurrentSection(section[0], {sidebarClicked: true})
             }},
             m("span.w-6", m.trust(section[1])),
             m("span.text-xs mt-1", section[0])

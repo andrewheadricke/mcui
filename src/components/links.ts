@@ -2,28 +2,27 @@ import m from 'mithril'
 import AppState from '../lib/appstate'
 import { map as svgMap, list as svgList, hashtag as svgHashtag } from './svgs'
 import linksmap from './linksmap'
-import { Buffer } from 'buffer'
 
 let linksList = {
   view: (vnode)=>{
     return AppState.packetLogs.iterateLinks(vnode.attrs.hashMode, (link, usage)=>{
-      let nodeAPrefix, nodeBPrefix: Buffer
+      let nodeAPrefix, nodeBPrefix: string
       if (vnode.attrs.hashMode == 0) {
-        nodeAPrefix = Buffer.from(link.substring(0, 2), 'hex');
-        nodeBPrefix = Buffer.from(link.substring(2, 4), 'hex');
+        nodeAPrefix = link.substring(0, 2)
+        nodeBPrefix = link.substring(2, 4)
       } else if (vnode.attrs.hashMode == 1) {
-        nodeAPrefix = Buffer.from(link.substring(0, 4), 'hex');
-        nodeBPrefix = Buffer.from(link.substring(4, 8), 'hex');
+        nodeAPrefix = link.substring(0, 4)
+        nodeBPrefix = link.substring(4, 8)
       }
-      let nodeA = AppState.identityManager.getRepeatersByPrefix(nodeAPrefix)
-      let nodeB = AppState.identityManager.getRepeatersByPrefix(nodeBPrefix)
+      let nodeA = AppState.identityManager.getRepeatersByPrefixHex(nodeAPrefix)
+      let nodeB = AppState.identityManager.getRepeatersByPrefixHex(nodeBPrefix)
       let nodeAtxt = nodeA.map((n)=>n.name).join(", ")
       let nodeBtxt = nodeB.map((n)=>n.name).join(", ")
-
+  
       let nodeAColor, nodeBColor
       let nodeAHasCoords, nodeBHasCoords
       let linkHasCoords = ""
-
+  
       if (nodeA.length == 1) {
         //nodeALoc = nodeA[0].lat / 1000000 + " " + nodeA[0].lon / 1000000
         if (nodeA[0].lat != 0 && nodeA[0].lon != 0) {
@@ -34,7 +33,7 @@ let linksList = {
       } else if (nodeA.length > 1) {
         nodeAColor = "text-red-500 font-bold"
       }
-
+  
       if (nodeB.length == 1) {
         //nodeBLoc = nodeB[0].lat / 1000000 + " " + nodeB[0].lon / 1000000
         if (nodeB[0].lat != 0 && nodeB[0].lon != 0) {
@@ -45,11 +44,11 @@ let linksList = {
       } else if (nodeB.length > 1) {
         nodeBColor = "text-red-500 font-bold"
       }
-
+  
       if (nodeAHasCoords && nodeBHasCoords) {
         linkHasCoords = m("div.inline-block ms-5 rounded-full bg-blue-500/10 px-4 py-1 text-xs text-white", "hasCoords")
       }
-
+  
       return m("div", m("div.inline-block min-w-20", link, " (", usage, ")"), m("span." + nodeAColor, nodeAtxt), " <--> ", m("span." + nodeBColor, nodeBtxt), linkHasCoords)
     })
   }

@@ -1,5 +1,5 @@
 import m from 'mithril'
-import {commentSlash as svgCommentSlash, send as svgSend, arrowsH as svgArrowsH, arrowLeft as svgArrowLeft } from './svgs'
+import {commentSlash as svgCommentSlash, send as svgSend, arrowsH as svgArrowsH, arrowLeft as svgArrowLeft, trash as svgTrash } from './svgs'
 import AppState from '../lib/appstate'
 import { formatTimeDifference } from '../lib/utils'
 import DropdownIdentSelector from './dropdown_ident_selector'
@@ -14,6 +14,7 @@ export default {
     vnode.state.activeChat = null
     vnode.state.dropdownActivator = null
     vnode.state.onIdentSelect = null
+    vnode.state.showDeleteBtn = false
 
     vnode.state.draftMsg = ""
 
@@ -46,7 +47,17 @@ export default {
           if (vnode.state.activeChat != null) {
             let senderNamePrefix = Array.from(vnode.state.activeChat.sender.name)[0]
             let recipientNamePrefix = Array.from(vnode.state.activeChat.recipient.name)[0]
-            return m("div.inline-block",
+            let deleteBtn = null
+            if (vnode.state.showDeleteBtn) {
+              deleteBtn = m("div.inline text-gray-500 cursor-pointer", {onclick:(e)=>{
+                AppState.messageStore.removeDirectChat(vnode.state.activeChatKey)
+                vnode.state.activeChatKey = null
+                vnode.state.activeChat = null
+              }}, m.trust(svgTrash))
+            }
+            return m("div.inline-block w-full", {onclick:(e)=>{
+                vnode.state.showDeleteBtn = true
+              }},
               m("div.inline-block md:hidden", m("button.rounded p-2 border-1 bg-gray-100 text-black relative top-1 cursor-pointer", {onclick:(e)=>vnode.state.activeChat=null}, m("div.w-4", m.trust(svgArrowLeft)))),
               m("span.inline-block items-center rounded-md px-2 py-1 text-sm md:text-base font-medium text-gray-500", 
                 m("div.inline-flex w-10 min-w-10 h-10 rounded-full flex items-center justify-center font-bold text-gray-100 ", {style:"background-color:" + vnode.state.activeChat.sender._rgb + ";"}, senderNamePrefix),
@@ -56,7 +67,8 @@ export default {
               m("span.inline-block items-center rounded-md px-2 py-1 text-sm md:text-base font-medium text-gray-500", 
                 m("div.inline-flex w-10 min-w-10 h-10 rounded-full flex items-center justify-center font-bold text-gray-100 ", {style:"background-color:" + vnode.state.activeChat.recipient._rgb + ";"}, recipientNamePrefix),
                 m("span.ms-2", vnode.state.activeChat.recipient.name)
-              )
+              ),
+              deleteBtn
             )
           } else {
             return m("h2.text-2xl md:text-3xl font-bold block md:hidden", "Direct Messages")
@@ -102,10 +114,12 @@ export default {
               results.push(                
                 m("div.border-b-1 border-gray-800 p-2 hover:bg-gray-800/30 cursor-pointer text-nowrap w-full flex flex-row", {onclick:()=>{
                   if (chatDetails.recipient == null || chatDetails.sender == null) {
+                    AppState.messageStore.removeDirectChat(key)
                     return
                   }
                   vnode.state.activeChatKey = key
                   vnode.state.activeChat = chatDetails
+                  vnode.state.showDeleteBtn = false
                 }},
                   m("div.inline-block align-top relative top-1",            
                     m("div.w-12 min-w-12 h-12 rounded-full flex items-center justify-center font-bold", {style:"background-color:" + rgb + ";"}, senderNamePrefix)

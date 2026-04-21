@@ -60,6 +60,7 @@ class Advert {
         a.appData.hasName = true
       }
       a.appData.hasLocation = false
+      a.appData.location = {lat: 0, lon: 0}
       return a
     }
 
@@ -85,6 +86,12 @@ class Advert {
       a.parseAppData(appData);
         
       return a
+    }
+
+    addLocation(lat, lon) {
+      this.appData.hasLocation = true
+      this.appData.location.lat = lat
+      this.appData.location.lon = lon
     }
 
     getFlags() {
@@ -130,6 +137,12 @@ class Advert {
       }
 
       bufferWriter.writeByte(flags)
+
+      if (this.appData.hasLocation) {
+        bufferWriter.writeUInt32LE(this.appData.location.lat);
+        bufferWriter.writeUInt32LE(this.appData.location.lon);
+      }
+
       bufferWriter.writeString(this.appData.name)
 
       //let b = bufferWriter.toBytes()
