@@ -113,13 +113,15 @@ export default {
               }
               results.push(                
                 m("div.border-b-1 border-gray-800 p-2 hover:bg-gray-800/30 cursor-pointer text-nowrap w-full flex flex-row", {onclick:()=>{
-                  if (chatDetails.recipient == null || chatDetails.sender == null) {
+                  if (/*chatDetails.recipient == null ||*/ chatDetails.sender == null) {
                     AppState.messageStore.removeDirectChat(key)
                     return
                   }
-                  vnode.state.activeChatKey = key
-                  vnode.state.activeChat = chatDetails
-                  vnode.state.showDeleteBtn = false
+                  if (chatDetails.recipient != null) {
+                    vnode.state.activeChatKey = key
+                    vnode.state.activeChat = chatDetails
+                    vnode.state.showDeleteBtn = false
+                  }
                 }},
                   m("div.inline-block align-top relative top-1",            
                     m("div.w-12 min-w-12 h-12 rounded-full flex items-center justify-center font-bold", {style:"background-color:" + rgb + ";"}, senderNamePrefix)
