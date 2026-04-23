@@ -5,6 +5,7 @@ import Advert from './advert'
 import { decryptChannelMsg, decryptTxtMsg, decryptAnonReq } from "../lib/decryption";
 import { bytesToHex } from '@noble/hashes/utils.js';
 import { buildResponse, buildSyncMsg } from "./txtbuilder";
+import ControlData from './controldata';
 
 class RadioStore {
 
@@ -225,6 +226,25 @@ class RadioStore {
           this.activeConnection.sendToRadioFrame(respFrame)
           let room = AppState.roomManager.getRoom(decodedResult.data.recipient)
           room.startSync(decodedResult.data.sender, decodedResult.data.syncTimestamp)          
+        }
+      } else if (pkt.payload_type == Packet.PAYLOAD_TYPE_CONTROL) {
+        let ctlData = ControlData.parseControlData(pkt.payload)
+        //console.log(ctlData)
+        if (ctlData.subType == 8 && ctlData.typeFilters.indexOf("repeaters") >= 0) {
+          let myIdentities = AppState.identityManager.getMyIdentities()
+          for (let a = 0; a < myIdentities.length; a++) {
+            if (myIdentities[a].autoDiscover && myIdentities[a].type == "REPEATER") {
+              let respPkt = ctlData.createDiscoveryResponsePacket(event.lastSnr, myIdentities[a].publicKey)
+              //console.log(respPkt)
+              let frame = new Uint8Array(respPkt.length + 1)
+              frame.set([53])
+              frame.set(respPkt, 1)
+              // send after a short delay
+              setTimeout(()=>{
+                this.activeConnection.sendToRadioFrame(frame)
+              }, 750)              
+            }
+          }
         }
       }
   

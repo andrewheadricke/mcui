@@ -1,7 +1,7 @@
 import m from 'mithril'
 import { formatTimeDifference } from "../lib/utils"
 import { key as svgKey, cog as svgCog, edit as svgEdit, circleCheck as svgCircleCheck, save as svgSave, broadcast as svgBroadcast, users as svgUsers } from './svgs'
-import { satellite as svgSatellite, trash as svgTrash, towerCell as svgTowerCell, map as svgMap } from './svgs'
+import { satellite as svgSatellite, trash as svgTrash, towerCell as svgTowerCell, map as svgMap, crosshairs as svgCrosshairs } from './svgs'
 import AppState from '../lib/appstate'
 import { Packet } from "meshcore.js"
 import { bytesToHex } from '@noble/hashes/utils.js'
@@ -20,8 +20,12 @@ const dropdownIdentity = {
         (()=>{
           if (vnode.attrs.isContact == false) {
             let autoAckColor = ""
+            let autoDiscoverColor = ""
             if (vnode.attrs.autoAck) {
               autoAckColor = "text-green-600"
+            }
+            if (vnode.attrs.autoDiscover) {
+              autoDiscoverColor = "text-green-600"
             }
             return [
               m("li",
@@ -30,6 +34,13 @@ const dropdownIdentity = {
                   identity.toggleAutoAck()
                   AppState.identityManager.saveIdentities()
                 }}, m.trust(svgCircleCheck), " Auto ACK")
+              ),
+              m("li",
+                m("a.block px-4 py-2 hover:bg-gray-100 " + autoDiscoverColor, {href:"#", onclick:()=>{
+                  let identity = AppState.identityManager.getIdentity(vnode.attrs.publicKey)
+                  identity.toggleAutoDiscover()
+                  AppState.identityManager.saveIdentities()
+                }}, m("div.inline-block", {style:"width:20px;height:20px;"}, m.trust(svgCrosshairs)), m("div.inline-block align-top ms-1", " Auto Discover"))
               ),
               m("li",
                 m("a.block px-4 py-2 hover:bg-gray-100", {href:"#", onclick:async ()=>{
@@ -169,7 +180,7 @@ export default {
       ),
       (()=>{
         if (vnode.state.menuVisible) {
-          return m(dropdownIdentity, {privateKey: vnode.attrs.identity.privateKey, autoAck: vnode.attrs.identity.autoAck, isContact: vnode.attrs.identity.privateKey == null, showNameEdit: ()=>vnode.state.showNameEdit=true, publicKey: vnode.attrs.identity.getPublicKeyHex()})
+          return m(dropdownIdentity, {privateKey: vnode.attrs.identity.privateKey, autoAck: vnode.attrs.identity.autoAck, autoDiscover: vnode.attrs.identity.autoDiscover, isContact: vnode.attrs.identity.privateKey == null, showNameEdit: ()=>vnode.state.showNameEdit=true, publicKey: vnode.attrs.identity.getPublicKeyHex()})
         }
       })(),
       (()=>{

@@ -3,6 +3,7 @@ import BufferWriter from "./buffer_writer";
 import { Packet } from 'meshcore.js'
 import { packetSerialize } from "./packet_helper";
 import AppState from '../lib/appstate'
+import { convertSnr } from "./snr";
 
 class TraceManager {
   traces: Trace[]
@@ -212,14 +213,3 @@ class Trace {
 export {
   TraceManager
 } 
-
-function convertSnr(snr: number) {
-  let signedSnr
-  if (snr > 127) {
-    signedSnr = snr - 256
-  } else {
-    signedSnr = snr
-  }
-  //console.log(signedSnr)
-  return signedSnr / 4.0
-}

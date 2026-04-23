@@ -334,6 +334,7 @@ class Identity {
   advertPath: string
   pathHashMode: number
   autoAck: boolean = false
+  autoDiscover: boolean = false
 
   _rgb: string
 
@@ -367,6 +368,9 @@ class Identity {
     this.pathHashMode = identityObj.pathHashMode
     if (identityObj.autoAck != null) {
       this.autoAck = identityObj.autoAck
+    }
+    if (identityObj.autoDiscover != null) {
+      this.autoDiscover = identityObj.autoDiscover
     }
 
     let fnv = fnv1a(this.name)
@@ -505,6 +509,14 @@ class Identity {
     }
   }
 
+  toggleAutoDiscover() {
+    if (this.autoDiscover) {
+      this.autoDiscover = false
+    } else {
+      this.autoDiscover = true
+    }
+  }
+
   getAckIfNeeded(fromPath: Uint8Array, ack: Uint8Array, ): Uint8Array | null {
 
     if (this.autoAck == undefined || this.autoAck == false) {
@@ -520,7 +532,7 @@ class Identity {
     header |= (Packet.ROUTE_TYPE_DIRECT & Packet.PH_ROUTE_MASK)
     header |= (type                     & Packet.PH_TYPE_MASK) << Packet.PH_TYPE_SHIFT;
     header |= (version                  & Packet.PH_VER_MASK)  << Packet.PH_VER_SHIFT;
-    let pkt = new Packet(header, [0,0], fromPath.reverse(), ack)
+    let pkt = new Packet(header, [0,0], 2, fromPath.reverse(), ack)
     let pktBytes = packetSerialize(pkt)
     let frame = new Uint8Array(pktBytes.length + 1)
     frame.set([53])
