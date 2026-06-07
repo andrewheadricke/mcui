@@ -53,9 +53,10 @@ const dropdownIdentity = {
                   let payload = decodedPacket.parsePayload()
                   //console.log(payload)
       
-                  const data = new Uint8Array(pkt.length + 1);
-                  data[0] = 53
-                  data.set(pkt, 1)
+                  const data = new Uint8Array(pkt.length + 2);
+                  data[0] = window.CMD_SEND_RAW_PACKET
+                  data[1] = 0 // priority
+                  data.set(pkt, 2)
                   
                   let result = await AppState.radioStore.sendToRadioFrame(data)
                   if (result != null) {
@@ -70,9 +71,10 @@ const dropdownIdentity = {
 
                   //console.log(pkt)
       
-                  const data = new Uint8Array(pkt.length + 1);
-                  data[0] = 53
-                  data.set(pkt, 1)
+                  const data = new Uint8Array(pkt.length + 2);
+                  data[0] = window.CMD_SEND_RAW_PACKET
+                  data[1] = 0 // priority
+                  data.set(pkt, 2)
                   
                   let result = await AppState.radioStore.sendToRadioFrame(data)
                   if (result != null) {

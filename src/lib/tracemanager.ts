@@ -193,9 +193,9 @@ class Trace {
     let pkt = new Packet(header, [0,0], this.prefixLength, pathBytes, payload)
     let pktBytes = packetSerialize(pkt)
 
-    const data = new Uint8Array(pktBytes.length + 1);
-    data[0] = 53
-    data.set(pktBytes, 1)
+    const data = new Uint8Array(pktBytes.length + 2);
+    data[0] = window.CMD_SEND_RAW_PACKET
+    data.set(pktBytes, 2)
 
     // send the packet
     AppState.radioStore.sendToRadioFrame(data)

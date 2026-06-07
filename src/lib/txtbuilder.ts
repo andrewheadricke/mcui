@@ -61,10 +61,10 @@ function buildGroupTxtPacket(senderIdentity: Identity, targetChannel: Channel, m
   bufferWriter.writeBytes(payloadBytes)
   let pktBytes = bufferWriter.toBytes()
 
-  // then wrap with a 53
-  let frame = new Uint8Array(pktBytes.length + 1)
-  frame[0] = 53
-  frame.set(pktBytes, 1)
+  // then wrap with a window.CMD_SEND_RAW_PACKET
+  let frame = new Uint8Array(pktBytes.length + 2)
+  frame[0] = window.CMD_SEND_RAW_PACKET
+  frame.set(pktBytes, 2)
 
   //console.log(frame)
 
@@ -127,10 +127,10 @@ function buildDirectTxtPacket(senderIdentity: Identity, recipientPublicKey: Uint
   bufferWriter.writeBytes(payloadBytes)
   let pktBytes = bufferWriter.toBytes()
 
-  // then wrap with a 53
-  let frame = new Uint8Array(pktBytes.length + 1)
-  frame[0] = 53
-  frame.set(pktBytes, 1)
+  // then wrap with a window.CMD_SEND_RAW_PACKET
+  let frame = new Uint8Array(pktBytes.length + 2)
+  frame[0] = window.CMD_SEND_RAW_PACKET
+  frame.set(pktBytes, 2)
 
   return frame
 }
@@ -193,10 +193,10 @@ function buildResponse(remotePublicKey: Uint8Array, localIdentity: Identity): Ui
   bufferWriter.writeBytes(payloadBytes)
   let pktBytes = bufferWriter.toBytes()
 
-  // then wrap with a 53
-  let frame = new Uint8Array(pktBytes.length + 1)
-  frame[0] = 53
-  frame.set(pktBytes, 1)
+  // then wrap with a window.CMD_SEND_RAW_PACKET
+  let frame = new Uint8Array(pktBytes.length + 2)
+  frame[0] = window.CMD_SEND_RAW_PACKET
+  frame.set(pktBytes, 2)
 
   return frame
 }
@@ -259,10 +259,10 @@ function buildSyncMsg(localIdentity: Identity, remotePublicKey: Uint8Array, msg:
   bufferWriter.writeBytes(payloadBytes)
   let pktBytes = bufferWriter.toBytes()
 
-  // then wrap with a 53
-  let frame = new Uint8Array(pktBytes.length + 1)
-  frame[0] = 53
-  frame.set(pktBytes, 1)
+  // then wrap with a window.CMD_SEND_RAW_PACKET
+  let frame = new Uint8Array(pktBytes.length + 2)
+  frame[0] = window.CMD_SEND_RAW_PACKET
+  frame.set(pktBytes, 2)
 
   return frame
 }

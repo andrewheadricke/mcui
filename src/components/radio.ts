@@ -4,6 +4,7 @@ import { websocket as svgWebsocket, bluetooth as svgBluetooth, usb as svgUsb } f
 import { cog as svgCog, trash as svgTrash, plugCircleCheck as svgPlugCircleCheck } from './svgs'
 import { batteryHalf as svgBatteryHalf } from './svgs'
 import AppState from '../lib/appstate'
+import { isElectron } from '../lib/utils'
 
 let NewRadioForm = {
   oninit: (vnode)=>{
@@ -39,24 +40,29 @@ let NewRadioForm = {
               m("div.inline-block align-top ms-1", {style:"margin-top:1px;"}, "WebSocket")
             ))
           ),
-          m("li",
-            m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:(e)=>{
-              e.preventDefault()
-              vnode.state.connectionType = "ble"
-            }}, m("div", 
-              m("div.inline-block h-6 w-6", m.trust(svgBluetooth)), 
-              m("div.inline-block align-top ms-1", {style:"margin-top:2px;"}, "BLE")
-            ))
-          ),
-          m("li",
-            m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:(e)=>{
-              e.preventDefault()
-              vnode.state.connectionType = "serial"
-            }}, m("div", 
-              m("div.inline-block h-6 w-6", m.trust(svgUsb)), 
-              m("div.inline-block align-top ms-1", {style:"margin-top:2px;"}, "USB/Serial")
-            ))
-          )
+          (()=>{
+            if (globalThis.AndroidBridge == null && isElectron() == false) {
+              return [ m("li",
+                  m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:(e)=>{
+                    e.preventDefault()
+                    vnode.state.connectionType = "ble"
+                  }}, m("div", 
+                    m("div.inline-block h-6 w-6", m.trust(svgBluetooth)), 
+                    m("div.inline-block align-top ms-1", {style:"margin-top:2px;"}, "BLE")
+                  ))
+                ),
+                m("li",
+                  m("a.block px-4 py-2 hover:bg-gray-100 font-normal", {href:"#", onclick:(e)=>{
+                    e.preventDefault()
+                    vnode.state.connectionType = "serial"
+                  }}, m("div", 
+                    m("div.inline-block h-6 w-6", m.trust(svgUsb)), 
+                    m("div.inline-block align-top ms-1", {style:"margin-top:2px;"}, "USB/Serial")
+                  ))
+                )
+              ]
+            }
+          })()
         )
       ),
       (()=>{

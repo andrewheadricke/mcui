@@ -534,9 +534,9 @@ class Identity {
     header |= (version                  & Packet.PH_VER_MASK)  << Packet.PH_VER_SHIFT;
     let pkt = new Packet(header, [0,0], 2, fromPath.reverse(), ack)
     let pktBytes = packetSerialize(pkt)
-    let frame = new Uint8Array(pktBytes.length + 1)
-    frame.set([53])
-    frame.set(pktBytes, 1)
+    let frame = new Uint8Array(pktBytes.length + 2)
+    frame.set([window.CMD_SEND_RAW_PACKET, 0])
+    frame.set(pktBytes, 2)
     return frame
   }
 }

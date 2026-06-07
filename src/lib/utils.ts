@@ -73,9 +73,22 @@ function percentageToGreenToRed(percentage) {
   return hslToRgb(hue, 1, 0.5)
 }
 
+function isElectron() {
+  // Renderer process with nodeIntegration true or Main process
+  if (typeof globalThis.process !== 'undefined' && globalThis.process.versions && globalThis.process.versions.electron) {
+    return true;
+  }
+  // Renderer process with nodeIntegration false
+  if (typeof window !== 'undefined' && typeof window.navigator === 'object' && window.navigator.userAgent.indexOf('Electron') !== -1) {
+    return true;
+  }
+  return false;
+}
+
 export {
   formatTimeDifference,
   hslToRgb,
   greenToRedViaYellow,
-  percentageToGreenToRed
+  percentageToGreenToRed,
+  isElectron
 }

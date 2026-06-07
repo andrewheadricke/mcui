@@ -96,7 +96,7 @@ class RadioStore {
 
       this.activeConnection.sendCommandAppStart()
       // first send CMD_APP_START
-      // then send CMD_SEND_RAW_PACKET (53)
+      // then send CMD_SEND_RAW_PACKET (CMD_SEND_RAW_PACKET)
     })
     this.activeConnection.on("disconnected", () => {
       //console.log("disconnected");
@@ -108,8 +108,8 @@ class RadioStore {
       //console.log("SelfInfo", event)
       r.username = event.name
 
-      let sendBuf = new Uint8Array(1)
-      sendBuf[0] = 53
+      let sendBuf = new Uint8Array(4)
+      sendBuf[0] = window.CMD_SEND_RAW_PACKET
       this.activeConnection.sendToRadioFrame(sendBuf)
       //m.redraw()
     })
@@ -120,16 +120,8 @@ class RadioStore {
       r.hardware = event.manufacturerModel
     })
     this.activeConnection.on(Constants.ResponseCodes.Ok, (event)=>{
-      //console.log('got response code')
+      console.log('got response code')
       //console.log(event)
-      if (this.waitingForHandshakeCompletion) {
-        //vnode.attrs.connWriter.getRawPacketSupport = ()=>true
-        console.log('rawPacketSupported')
-        r.sendRawPacketSupport = true
-        this.waitingForHandshakeCompletion = false
-        this.saveToLocalStorage()
-        m.redraw()
-      }
     })
     this.activeConnection.on(Constants.ResponseCodes.BatteryVoltage, (event)=>{
       console.log(event)
@@ -137,11 +129,15 @@ class RadioStore {
       m.redraw()
     })
     this.activeConnection.on(Constants.ResponseCodes.Err, (event)=>{
-      //console.log('got response err')
+      console.log('got response err', event)
       if (this.waitingForHandshakeCompletion) {
         if (event.errCode == 1) {
           //vnode.attrs.connWriter.getRawPacketSupport = ()=>false
           console.log('rawPacketNotSupported')
+          this.saveToLocalStorage()
+        } else if (event.errCode == 6) {
+          r.sendRawPacketSupport = true
+          console.log('rawPacketSupported')
           this.saveToLocalStorage()
         }
         this.waitingForHandshakeCompletion = false
@@ -236,9 +232,9 @@ class RadioStore {
             if (myIdentities[a].autoDiscover && myIdentities[a].type == "REPEATER") {
               let respPkt = ctlData.createDiscoveryResponsePacket(event.lastSnr, myIdentities[a].publicKey)
               //console.log(respPkt)
-              let frame = new Uint8Array(respPkt.length + 1)
-              frame.set([53])
-              frame.set(respPkt, 1)
+              let frame = new Uint8Array(respPkt.length + 2)
+              frame.set([window.CMD_SEND_RAW_PACKET, 0])
+              frame.set(respPkt, 2)
               // send after a short delay
               setTimeout(()=>{
                 this.activeConnection.sendToRadioFrame(frame)
