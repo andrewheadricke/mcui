@@ -1,17 +1,21 @@
-import { bytesToHex } from "@noble/hashes/utils.js"
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js"
 import { Buffer } from "buffer"
 
 class PacketLogs {
   encryptedPackets: PacketLog[]
   ingressStats: Map<number, IngressStats>
-  links1b: {link: String, usage: number}
-  links2b: {link: String, usage: number}
+  links1b: {link: string, usage: number}
+  links2b: {link: string, usage: number}
+  ourNodePrefix: string
+  disable1byte: boolean
 
   init() {
     this.encryptedPackets = []
     this.ingressStats = new Map<number, IngressStats>
-    this.links1b = {} as {link: String, usage: number}
-    this.links2b = {} as {link: String, usage: number}
+    this.links1b = {} as {link: string, usage: number}
+    this.links2b = {} as {link: string, usage: number}
+    this.ourNodePrefix = ""
+    this.disable1byte = false
 
     let tmpLinks = localStorage.getItem("links1b")
     if (tmpLinks != null) {
@@ -20,6 +24,14 @@ class PacketLogs {
     tmpLinks = localStorage.getItem("links2b")
     if (tmpLinks != null) {
       this.links2b = JSON.parse(tmpLinks)
+    }
+    let tmpOurNodePrefix = localStorage.getItem("ourNodePrefix")
+    if (tmpOurNodePrefix != null) {
+      this.ourNodePrefix = tmpOurNodePrefix
+    }
+    let disable1byte = localStorage.getItem("disable1byte")
+    if (disable1byte != null) {
+      this.disable1byte = JSON.parse(disable1byte)
     }
   }
 
@@ -36,8 +48,19 @@ class PacketLogs {
     return l1 + l2
   }
 
-  addLinks(path: Uint8Array, prefixLength: number) {
+  addLinks(_path: Uint8Array, prefixLength: number) {    
+
+    let path: Uint8Array
+    if (this.ourNodePrefix != "") {
+      let prefixBytes = hexToBytes(this.ourNodePrefix)
+      path = Buffer.from([..._path, ...prefixBytes])
+    } else {
+      path = Buffer.from(_path)
+    }
     if (path.length < 2) {
+      return
+    }
+    if (prefixLength == 1 && this.disable1Byte) {
       return
     }
     //console.log(path, prefixLength)
@@ -98,21 +121,27 @@ class PacketLogs {
   }
 
   clearData() {
-    this.links1b = {} as {link: String, usage: number}
+    this.links1b = {} as {link: string, usage: number}
     localStorage.removeItem("links1b")
-    this.links2b = {} as {link: String, usage: number}
+    this.links2b = {} as {link: string, usage: number}
     localStorage.removeItem("links2b")
     localStorage.removeItem("links")
+    localStorage.removeItem("ourNodePrefix")
+    localStorage.removeItem("disable1byte")
   }
 
   importData(data) {
     if (data != null) {
-      localStorage.setItem("links", JSON.stringify(data))
+      let dataObj: any = JSON.stringify(data)
+      localStorage.setItem("links1b", dataObj.links1b)
+      localStorage.setItem("links2b", dataObj.links2b)
+      localStorage.setItem("ourNodePrefix", dataObj.ourNodePrefix)
+      localStorage.setItem("disable1byte", dataObj.disable1byte)
     }
   }
 
   exportData() {
-    return {links1b: this.links1b, links2b: this.links2b}
+    return {links1b: this.links1b, links2b: this.links2b, ourNodePrefix: this.ourNodePrefix, disable1Byte: this.disable1Byte}
   }
 
   addEncryptedPacket(path: Uint8Array, rawPkt: Uint8Array) {
@@ -163,6 +192,16 @@ class PacketLogs {
 
   getIngressStats(): any {
     return Object.fromEntries(this.ingressStats)
+  }
+
+  setOurNodePrefix(prefix: string) {
+    this.ourNodePrefix = prefix
+    localStorage.setItem("ourNodePrefix", this.ourNodePrefix)
+  }
+
+  disable1Byte() {
+    this.disable1byte = true
+    localStorage.setItem("disable1byte", JSON.stringify(this.disable1byte))
   }
 }
 
